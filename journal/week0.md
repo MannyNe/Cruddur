@@ -16,7 +16,7 @@
     - [X] Use EventBridge to hookup Health Dashboard to SNS and send notification when there is a service health issue.
     - [X] Review all the questions of each pillars in the Well Architected Tool (No specialized lens).
     - [X] Research the technical and service limits of specific services and how they could impact the technical path for technical flexibility. 
-    - [] Open a support ticket and request a service limit.
+    - [X] Open a support ticket and request a service limit.
 
 - I will describe my work and the process I overcame in the order provided above.
 
