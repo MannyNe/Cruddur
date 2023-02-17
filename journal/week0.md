@@ -237,3 +237,11 @@ The Well Architected Tool consists of the following six pillars:
 
 
 - I researched a bit about the AWS Free Tier and gathered some information. The Free Tier provides access to a range of services with no upfront costs or usage fees. The AWS Free Tier includes some usage limits that ensure that new customers have a positive customer experience when they start exploring AWS. These limits vary from service to service, and in some cases, may apply to certain resources or functions within a service. The free tier of Amazon EC2 provides access to 750/730 hours per month of t2.micro instance usage, or 30GB of total EBS storage per month.  If we exceed these limits, we would need to pay for additional services or delay certain tasks until monthly usage resets. Additionally, certain features may not be available in the free tier version of a service, such as Amazon S3 versioning or Amazon CloudFront caching. This may limit your technical flexibility in building an application.
+
+-------------------------
+
+### Open a support ticket and request a service limit
+
+- I opened a support ticket by navigating to the [AWS Support Center](https://support.console.aws.amazon.com/support/home#/). On the left side menu, I selected “Create Case”, then selected “Looking for service limit increase?” from the link in the center right, then I specified what limit or feature I needed and clicked on “Create Case”. After that the ticket I opened looked like this: 
+
+![Topic Subscription ScreenSh.](assets/week-0/Service-limit.png)
