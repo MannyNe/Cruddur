@@ -1,4 +1,5 @@
 # Week 0 — Billing and Architecture
+![Conceptual Diagram (Napkin)](assets/AWS-Bootcamp_Banner.jpg)
 - In this week, we learnt about a variety of technologies to progress with our cloud knowledge. Some of the things we learnt includes: 
     * How to design diagrams using napkins as well as architectural diagrams of what we plan to build
     * How to use Lucid Charts to build architectural designs
