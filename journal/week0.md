@@ -15,7 +15,7 @@
     - [X] Setting an IAM role and securing it with MFA.
     - [X] Use EventBridge to hookup Health Dashboard to SNS and send notification when there is a service health issue.
     - [X] Review all the questions of each pillars in the Well Architected Tool (No specialized lens).
-    - [] Research the technical and service limits of specific services and how they could impact the technical path for technical flexibility. 
+    - [X] Research the technical and service limits of specific services and how they could impact the technical path for technical flexibility. 
     - [] Open a support ticket and request a service limit.
 
 - I will describe my work and the process I overcame in the order provided above.
@@ -232,3 +232,8 @@ The Well Architected Tool consists of the following six pillars:
 - **Business Agility**, which asks how we enable rapid responses to changing customer requirements and market trends.
 
 ----------------------
+
+### Researching the technical and service limits of specific services and how they could impact the technical path for technical flexibility.
+
+
+- I researched a bit about the AWS Free Tier and gathered some information. The Free Tier provides access to a range of services with no upfront costs or usage fees. The AWS Free Tier includes some usage limits that ensure that new customers have a positive customer experience when they start exploring AWS. These limits vary from service to service, and in some cases, may apply to certain resources or functions within a service. The free tier of Amazon EC2 provides access to 750/730 hours per month of t2.micro instance usage, or 30GB of total EBS storage per month.  If we exceed these limits, we would need to pay for additional services or delay certain tasks until monthly usage resets. Additionally, certain features may not be available in the free tier version of a service, such as Amazon S3 versioning or Amazon CloudFront caching. This may limit your technical flexibility in building an application.
