@@ -1,4 +1,24 @@
 # Week 0 — Billing and Architecture
+- In this week, we learnt about a variety of technologies to progress with our cloud knowledge. Some of the things we learnt includes: 
+    * How to design diagrams using napkins as well as architectural diagrams of what we plan to build
+    * How to use Lucid Charts to build architectural designs
+    * About C4 Models
+    * Look-through the cloud services we utilize
+    * Setting up AWS free-tier and understand how to track spend in AWS (AWS Budgets, AWS Cost Explorer, Billing Alarms)
+    * Understanding how to look at monthly billing reports
+    * Launching AWS CloudShell and looking at AWS CLI
+    * Generating AWS credentials
+
+## Required Homework/Tasks
+- To test if we grasped the concepts provided to us through the meeting as well as the provided videos to aid us, we were given homeworks. They are:
+    - [X] Create an architectural diagram (to the best of your ability) the CI/CD logical pipeline in Lucid Charts.
+    - [X] Setting an IAM role and securing it with MFA.
+    - [X] Use EventBridge to hookup Health Dashboard to SNS and send notification when there is a service health issue.
+    - [] Review all the questions of each pillars in the Well Architected Tool (No specialized lens).
+    - [] Research the technical and service limits of specific services and how they could impact the technical path for technical flexibility. 
+    - [] Open a support ticket and request a service limit.
+
+- I will describe my work and the process I overcame in the order provided above.
 
 ![Diagram](assets/Application_Design(Logical-Diagram).png)
 
@@ -18,7 +38,7 @@ The json syntax:
         "Amount": "10",
         "Unit": "USD"
     },
-    "BudgetName": "Second Budget from IAM",
+    "BudgetName": "My AWS Bootcamp Budget",
     "BudgetType": "COST",
     "CostFilters": {
         "TagKeyValue": [
@@ -27,11 +47,11 @@ The json syntax:
         ]
     },
     "CostTypes": {
-        "IncludeCredit": true,
+        "IncludeCredit": false,
         "IncludeDiscount": true,
         "IncludeOtherSubscription": true,
         "IncludeRecurring": true,
-        "IncludeRefund": true,
+        "IncludeRefund": false,
         "IncludeSubscription": true,
         "IncludeSupport": true,
         "IncludeTax": true,
@@ -62,6 +82,34 @@ The json syntax:
                 "SubscriptionType": "EMAIL"
             }
         ]
+    },
+    {
+        "Notification": {
+            "ComparisonOperator": "GREATER_THAN",
+            "NotificationType": "ACTUAL",
+            "Threshold": 100,
+            "ThresholdType": "PERCENTAGE"
+        },
+        "Subscribers": [
+            {
+                "Address": "amannnegussie2@outlook.com",
+                "SubscriptionType": "EMAIL"
+            }
+        ]
+    },
+    {
+        "Notification": {
+            "ComparisonOperator": "GREATER_THAN",
+            "NotificationType": "FORECASTED",
+            "Threshold": 100,
+            "ThresholdType": "PERCENTAGE"
+        },
+        "Subscribers": [
+            {
+                "Address": "amannnegussie2@outlook.com",
+                "SubscriptionType": "EMAIL"
+            }
+        ]
     }
 ]
 ```
@@ -76,7 +124,7 @@ The json syntax:
     "AlarmDescription": "This alarm would be triggered if the daily estimated charges exceeds 1$",
     "ActionsEnabled": true,
     "AlarmActions": [
-        "arn:aws:sns:us-east-1:--REDACTED--:b82502fe-3d92-4381-a3a8-b7b5298829b5"
+        "arn:aws:sns:us-east-1:706157350338:Default_CloudWatch_Alarms_Topic"
     ],
     "EvaluationPeriods": 1,
     "DatapointsToAlarm": 1,

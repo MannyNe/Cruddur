@@ -3,7 +3,7 @@
         "Amount": "10",
         "Unit": "USD"
     },
-    "BudgetName": "Second Budget from IAM",
+    "BudgetName": "My AWS Bootcamp Budget",
     "BudgetType": "COST",
     "CostFilters": {
         "TagKeyValue": [
@@ -12,11 +12,11 @@
         ]
     },
     "CostTypes": {
-        "IncludeCredit": true,
+        "IncludeCredit": false,
         "IncludeDiscount": true,
         "IncludeOtherSubscription": true,
         "IncludeRecurring": true,
-        "IncludeRefund": true,
+        "IncludeRefund": false,
         "IncludeSubscription": true,
         "IncludeSupport": true,
         "IncludeTax": true,
