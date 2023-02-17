@@ -20,7 +20,26 @@
 
 - I will describe my work and the process I overcame in the order provided above.
 
-![Diagram](assets/Application_Design(Logical-Diagram).png)
+### Conceptual, Architectural(Logical) Diagrams
+
+- The Conceptual (Napkin) Design I did looks like this. I know it isn't much, but hey, it's honest work :)
+
+![Conceptual Diagram (Napkin)](assets/week-0/Conceptual_Diagram.png)
+[Conceptual Diagram - Lucid Charts](https://lucid.app/lucidchart/ae2dab9c-3331-4b0a-b610-26a5be45672c/edit?viewport_loc=-216%2C-198%2C2720%2C1358%2CwcSxugjtXe~j&invitationId=inv_ce17d7f5-4aed-45ef-97a5-4e0fb7813844)
+
+- The Logical Diagram for the application is shown below. I used the one given as an example and redesigned it a bit according to the [formatting powerpoint documentation by AWS.](https://media.amazonwebservices.com/architecturecenter/icons/AWS_Simple_Icons_ppt.pptx)
+
+![Logical Diagram (Application)](assets/week-0/Application_Design(Logical-Diagram).png)
+[Logical Diagram (Application) - Lucid Charts](https://lucid.app/lucidchart/ae2dab9c-3331-4b0a-b610-26a5be45672c/edit?viewport_loc=-216%2C-198%2C2720%2C1358%2CwcSxugjtXe~j&invitationId=inv_ce17d7f5-4aed-45ef-97a5-4e0fb7813844)
+
+- The Logical Diagram I came up for the CI/CD pipeline is shown below. I'd like to improve this diagram when we further push into this course :)
+
+![Logical Diagram (CI/CD)](assets/week-0/CI_CD_Pipeline(Logical_Diagram).png)
+[Logical Diagram (CI/CD) - Lucid Charts](https://lucid.app/lucidchart/ae2dab9c-3331-4b0a-b610-26a5be45672c/edit?viewport_loc=-216%2C-198%2C2720%2C1358%2CwcSxugjtXe~j&invitationId=inv_ce17d7f5-4aed-45ef-97a5-4e0fb7813844)
+
+## Setting an IAM role and securing it with MFA
+
+- 
 
 ## Create a Cost and Usage budget
 
