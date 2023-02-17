@@ -14,7 +14,7 @@
     - [X] Create an architectural diagram (to the best of your ability) the CI/CD logical pipeline in Lucid Charts.
     - [X] Setting an IAM role and securing it with MFA.
     - [X] Use EventBridge to hookup Health Dashboard to SNS and send notification when there is a service health issue.
-    - [] Review all the questions of each pillars in the Well Architected Tool (No specialized lens).
+    - [X] Review all the questions of each pillars in the Well Architected Tool (No specialized lens).
     - [] Research the technical and service limits of specific services and how they could impact the technical path for technical flexibility. 
     - [] Open a support ticket and request a service limit.
 
@@ -206,3 +206,29 @@ The ```alarm-config.json``` file:
 
 The ```alarm-config.json``` file can be found [here](https://github.com/MannyNe/AWS-bootcamp/blob/week-0/aws/json/alarm-config.json)
 
+----------------------------------------------------------------
+
+### Hooking up Health Dashboard to SNS using EventBridge
+- I followed the documentation provided in [this link](https://docs.aws.amazon.com/health/latest/ug/cloudwatch-events-health.html#creating-event-bridge-events-rule-for-aws-health) to set the eventbridge with the health dashboard. In the [events console](https://console.aws.amazon.com/events/), we can navigate to the rules section to see newly added rules for events. My added rules is as follows:
+
+![Topic Subscription ScreenSh.](assets/week-0/HealthCheck.png)
+
+-------------------
+
+### Reviewing the questions of each pillars in the Well Architected Tool
+
+The Well Architected Tool consists of the following six pillars:
+
+- **Operational Excellence**, which asks how we utilize a fully automated operations pipeline for IT operations.
+
+- **Security**, which asks how we ensure that our security accounts are always up to date.
+
+- **Reliability**, which asks how we build highly reliable systems that self-heal and recover quickly when problems occur.
+
+- **Performance Efficiency**, which asks how we ensure that our systems are running at peak performance efficiently.
+
+- **Cost Optimization**, which asks how we reduce costs by utilizing cost optimization principles.
+
+- **Business Agility**, which asks how we enable rapid responses to changing customer requirements and market trends.
+
+----------------------
