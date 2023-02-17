@@ -30,27 +30,37 @@
 - The Logical Diagram for the application is shown below. I used the one given as an example and redesigned it a bit according to the [formatting powerpoint documentation by AWS.](https://media.amazonwebservices.com/architecturecenter/icons/AWS_Simple_Icons_ppt.pptx)
 
 ![Logical Diagram (Application)](assets/week-0/Application_Design(Logical-Diagram).png)
-[Logical Diagram (Application) - Lucid Charts](https://lucid.app/lucidchart/ae2dab9c-3331-4b0a-b610-26a5be45672c/edit?viewport_loc=-216%2C-198%2C2720%2C1358%2CwcSxugjtXe~j&invitationId=inv_ce17d7f5-4aed-45ef-97a5-4e0fb7813844)
+[Logical Diagram (Application) - Lucid Charts](https://lucid.app/lucidchart/ae2dab9c-3331-4b0a-b610-26a5be45672c/edit?viewport_loc=-5%2C-1039%2C1929%2C963%2C0_0&invitationId=inv_ce17d7f5-4aed-45ef-97a5-4e0fb7813844)
 
 - The Logical Diagram I came up for the CI/CD pipeline is shown below. I'd like to improve this diagram when we further push into this course :)
 
 ![Logical Diagram (CI/CD)](assets/week-0/CI_CD_Pipeline(Logical_Diagram).png)
-[Logical Diagram (CI/CD) - Lucid Charts](https://lucid.app/lucidchart/ae2dab9c-3331-4b0a-b610-26a5be45672c/edit?viewport_loc=-216%2C-198%2C2720%2C1358%2CwcSxugjtXe~j&invitationId=inv_ce17d7f5-4aed-45ef-97a5-4e0fb7813844)
+[Logical Diagram (CI/CD) - Lucid Charts](https://lucid.app/lucidchart/ae2dab9c-3331-4b0a-b610-26a5be45672c/edit?viewport_loc=-191%2C153%2C2158%2C1077%2Cx_JxpN-KF3Eh&invitationId=inv_ce17d7f5-4aed-45ef-97a5-4e0fb7813844)
 
-## Setting an IAM role and securing it with MFA
+----------------------
 
-- 
+### Setting an IAM role and securing it with MFA
 
-## Create a Cost and Usage budget
+- To set up the IAM role, I followed the steps provided in the video demonstrated by [Andrew Brown](https://www.youtube.com/watch?v=OdUnNuKylHg&list=PLBfufR7vyJJ7k25byhRXJldB5AiwgNnWv&index=14) on YouTube. The user I created is shown below.
 
-The following command was used to create a Cost and Usage budget using the AWS CLI.
+![IAM Account ScreenSh.](assets/week-0/Users-IAM.png)
+
+- For both the IAM user and the root user, I set up MFA to strengthen the security of my AWS account. The proof is shown below.
+
+![MFA Proof ScreenSh.](assets/week-0/User-Root-MFA.png)
+
+-----------------------------------------
+
+### Create a Cost and Usage budget
+
+- I previously used the tutorial provided by [Chirag](https://youtu.be/OVw3RrlP-sI?list=PLBfufR7vyJJ7k25byhRXJldB5AiwgNnWv), But I had to remove that budget from my account because I was concerned of budget spending going over the free limit. The following command was used to create a Cost and Usage budget using the AWS CLI in my GitPod environment.
 ```
 aws budgets create-budget \
     --account-id $AWS_ACCOUNT_ID \
     --budget file://aws/json/budget.json \
     --notifications-with-subscribers file://aws/json/budget-notifications-with-subscribers.json
 ```
-The json syntax:
+The ```Budget.json``` file:
 ```
 {
     "BudgetLimit": {
@@ -84,8 +94,11 @@ The json syntax:
     "TimeUnit": "MONTHLY"
 }
 ```
+![MFA Proof ScreenSh.](assets/week-0/Budgets.png)
+```Budget.json``` file can be found [here](https://github.com/MannyNe/AWS-bootcamp/blob/week-0/aws/json/budget.json)
 
-## Subscribe to SNS notification
+------------------------
+The ```budget-notifications-with-subscribers.json``` file:
 ```
 [
     {
@@ -132,45 +145,64 @@ The json syntax:
     }
 ]
 ```
+I added multiple notifications for my billing alarm to let me know if I passed the 80% and 100% threshold. I alse added a 100% forecast to the mix.
 
-## Creating a Cloudwatch Metric Alarm
+![Billing Alert ScreenSh.](assets/week-0/Billing-notification.png)
 
-`aws cloudwatch put-metric-alarm --cli-input-json file://aws/json/alarm_config.json`
+```budget-notifications-with-subscribers.json``` file can be found [here](https://github.com/MannyNe/AWS-bootcamp/blob/week-0/aws/json/budget-notifications-with-subscribers.json)
 
+----------------------------
+
+The CLI command I used for adding my email to my SNS topic is as follows. After that I confirmed the email I used to recieve notifications.
+```
+aws sns subscribe \
+    --topic-arn arn:aws:sns:us-east-1:706157350338:Default_CloudWatch_Alarms_Topic \
+    --protocol email \
+    --notification-endpoint amannnegussie2@outlook.com
+```
+![Topic Subscription ScreenSh.](assets/week-0/Topic-Subscription.png)
+
+--------------------
+
+### Creating a Cloudwatch Metric Alarm
+
+- To add a metric alarm I run the statement below. I modified the time to notify me if the estimated charges for 6 hours exceeds 1$.
+```
+aws cloudwatch put-metric-alarm --cli-input-json file://aws/json/alarm_config.json
+```
+
+The ```alarm-config.json``` file:
 ```
 {
-    "AlarmName": "DailyEstimatedCharges",
-    "AlarmDescription": "This alarm would be triggered if the daily estimated charges exceeds 1$",
+    "AlarmName": "Billing Alert",
     "ActionsEnabled": true,
     "AlarmActions": [
-        "arn:aws:sns:us-east-1:706157350338:Default_CloudWatch_Alarms_Topic"
+        "arn:aws:cloudwatch:us-east-1:706157350338:alarm:Billing Alert"
     ],
     "EvaluationPeriods": 1,
     "DatapointsToAlarm": 1,
     "Threshold": 1,
-    "ComparisonOperator": "GreaterThanOrEqualToThreshold",
+    "ComparisonOperator": "GreaterThanThreshold",
     "TreatMissingData": "breaching",
     "Metrics": [{
         "Id": "m1",
         "MetricStat": {
             "Metric": {
                 "Namespace": "AWS/Billing",
-                "MetricName": "EstimatedCharges",
+                "MetricName": "AWS Bootcamp Billing Alert",
                 "Dimensions": [{
                     "Name": "Currency",
                     "Value": "USD"
                 }]
             },
-            "Period": 86400,
+            "Period": 21600,
             "Stat": "Maximum"
         },
         "ReturnData": false
-    },
-    {
-        "Id": "e1",
-        "Expression": "IF(RATE(m1)>0,RATE(m1)*86400,0)",
-        "Label": "DailyEstimatedCharges",
-        "ReturnData": true
     }]
 }
 ```
+![Topic Subscription ScreenSh.](assets/week-0/Billing-Alert.png)
+
+The ```alarm-config.json``` file can be found [here](https://github.com/MannyNe/AWS-bootcamp/blob/week-0/aws/json/alarm-config.json)
+

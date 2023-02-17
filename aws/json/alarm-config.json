@@ -1,36 +1,28 @@
 {
-    "AlarmName": "DailyEstimatedCharges",
-    "AlarmDescription": "This alarm would be triggered if the daily estimated charges exceeds 1$",
+    "AlarmName": "Billing Alert",
     "ActionsEnabled": true,
     "AlarmActions": [
-        "arn:aws:sns:us-east-1:706157350338:Default_CloudWatch_Alarms_Topic"
+        "arn:aws:cloudwatch:us-east-1:706157350338:alarm:Billing Alert"
     ],
     "EvaluationPeriods": 1,
     "DatapointsToAlarm": 1,
     "Threshold": 1,
-    "ComparisonOperator": "GreaterThanOrEqualToThreshold",
+    "ComparisonOperator": "GreaterThanThreshold",
     "TreatMissingData": "breaching",
     "Metrics": [{
-            "Id": "m1",
-            "MetricStat": {
-                "Metric": {
-                    "Namespace": "AWS/Billing",
-                    "MetricName": "EstimatedCharges",
-                    "Dimensions": [{
-                        "Name": "Currency",
-                        "Value": "USD"
-                    }]
-                },
-                "Period": 86400,
-                "Stat": "Maximum"
+        "Id": "m1",
+        "MetricStat": {
+            "Metric": {
+                "Namespace": "AWS/Billing",
+                "MetricName": "AWS Bootcamp Billing Alert",
+                "Dimensions": [{
+                    "Name": "Currency",
+                    "Value": "USD"
+                }]
             },
-            "ReturnData": false
+            "Period": 21600,
+            "Stat": "Maximum"
         },
-        {
-            "Id": "e1",
-            "Expression": "IF(RATE(m1)>0,RATE(m1)*86400,0)",
-            "Label": "DailyEstimatedCharges",
-            "ReturnData": true
-        }
-    ]
+        "ReturnData": false
+    }]
 }
