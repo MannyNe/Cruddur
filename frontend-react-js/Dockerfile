@@ -30,4 +30,4 @@ ENV PORT=3000
 EXPOSE ${PORT}
 
 # Set the entrypoint command to run the script
-ENTRYPOINT ["bash", "./init.sh"]
+ENTRYPOINT ["bash", "./init-frontend.sh"]

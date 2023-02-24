@@ -29,4 +29,4 @@ ENV FLASK_APP=app.py \
     FLASK_DEBUG=0
 
 # Run the command to start Flask
-CMD [ "bash", "./init.sh" ]
+CMD [ "bash", "./init-backend.sh" ]
