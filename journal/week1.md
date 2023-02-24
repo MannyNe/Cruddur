@@ -58,7 +58,7 @@
 ### Running the dockerfile CMD as an external script
 - This was one of the challenging things to understand as a question. When I saw ``CMD as an external script``, I thought about a lot of things. But two stand out and I've implemented them both on my dockerfiles.
 
-    1. Create a bash script that runs the command which was located within the CMD statement, then execute that shell script within CMD. I implemented this within my Backend App [Dockerfile](https://github.com/MannyNe/AWS-bootcamp/blob/week-1/backend-flask/Dockerfile). Take a peek below :)
+    1. Create a bash script that runs the command which was located within the CMD statement, then execute that shell script within CMD. I implemented this within my Backend App [Dockerfile](https://github.com/MannyNe/AWS-bootcamp/blob/week-1/backend-flask/Dockerfile) and created a script file called [init-backend.sh](https://github.com/MannyNe/AWS-bootcamp/blob/week-1/backend-flask/init-backend.sh). Take a peek below :)
 
     ```
     .
@@ -67,7 +67,7 @@
     # Run the command to start Flask
     CMD [ "bash", "./init.sh" ]
     ```
-    2. Create a bash script that runs the command which was located within the CMD statement, then execute it using an ENTRYPOINT command. I implemented this within my Frontend App [Dockerfile](https://github.com/MannyNe/AWS-bootcamp/blob/week-1/frontend-react-js/Dockerfile). Take a peek below :)
+    2. Create a bash script that runs the command which was located within the CMD statement, then execute it using an ENTRYPOINT command. I implemented this within my Frontend App [Dockerfile](https://github.com/MannyNe/AWS-bootcamp/blob/week-1/frontend-react-js/Dockerfile) and created a script file called [init-frontend.sh](https://github.com/MannyNe/AWS-bootcamp/blob/week-1/frontend-react-js/init-frontend.sh). Take a peek below :)
 
     ```
     .
