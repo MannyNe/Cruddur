@@ -1,29 +1,32 @@
+# Build Stage
+# Start from a minimalistic Python image and copy requirements.txt
+FROM python:3.10-slim-buster AS builder
+WORKDIR /backend-flask
+COPY requirements.txt .
+
+# Install required packages
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Production Stage
+# Start from a minimalistic Python image
 FROM python:3.10-slim-buster
 
-# Inside Container
-# make a new folder inside container
+# Set the working directory to /app
 WORKDIR /backend-flask
 
-# Outside Container -> Inside Container
-# this contains the libraries want to install to run the app
-COPY requirements.txt requirements.txt
+# Copy the installed packages from the builder stage
+COPY --from=builder /usr/local/lib/python3.10/site-packages /usr/local/lib/python3.10/site-packages
 
-# Inside Container
-# Install the python libraries used for the app
-RUN pip3 install -r requirements.txt
-
-# Outside Container -> Inside Container
-# . means everything in the current directory
-# first period . - /backend-flask (outside container)
-# second period . /backend-flask (inside container)
+# Copy the current directory contents into the container at /app
 COPY . .
 
-# Set Enviroment Variables (Env Vars)
-# Inside Container and wil remain set when the container is running
-ENV FLASK_ENV=development
-
+# Expose the port the application will be running on
 EXPOSE ${PORT}
 
-# CMD (Command)
-# python3 -m flask run --host=0.0.0.0 --port=4567
+# Define environment variables
+ENV FLASK_APP=app.py \
+    FLASK_ENV=production \
+    FLASK_DEBUG=0
+
+# Run the command to start Flask
 CMD [ "python3", "-m" , "flask", "run", "--host=0.0.0.0", "--port=4567"]

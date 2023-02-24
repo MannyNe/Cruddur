@@ -1,6 +1,7 @@
 version: "3.8"
 services:
   backend-flask:
+    container_name: "backend_flask"
     environment:
       FRONTEND_URL: "https://3000-${GITPOD_WORKSPACE_ID}.${GITPOD_WORKSPACE_CLUSTER_HOST}"
       BACKEND_URL: "https://4567-${GITPOD_WORKSPACE_ID}.${GITPOD_WORKSPACE_CLUSTER_HOST}"
@@ -10,6 +11,7 @@ services:
     volumes:
       - ./backend-flask:/backend-flask
   frontend-react-js:
+    container_name: "frontend-react-js"
     environment:
       REACT_APP_BACKEND_URL: "https://4567-${GITPOD_WORKSPACE_ID}.${GITPOD_WORKSPACE_CLUSTER_HOST}"
     build: ./frontend-react-js
@@ -17,6 +19,7 @@ services:
       - "3000:3000"
     volumes:
       - ./frontend-react-js:/frontend-react-js
+      - /frontend-react-js/node_modules
   db:
     image: postgres:13-alpine
     restart: always
