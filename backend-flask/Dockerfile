@@ -29,4 +29,4 @@ ENV FLASK_APP=app.py \
     FLASK_DEBUG=0
 
 # Run the command to start Flask
-CMD [ "python3", "-m" , "flask", "run", "--host=0.0.0.0", "--port=4567"]
+CMD [ "bash", "./init.sh" ]
