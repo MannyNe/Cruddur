@@ -35,3 +35,58 @@
     - **Testing the image thoroughly** to ensure that it works as expected and meets the requirements of the application or service it will be used for.
 
 ----------------------
+
+### Using multi-stage building for a Dockerfile build
+- I added a multi-stage build for both the frontend and the backend app. By adding this feature to my dockerfiles, I saw a great reduce in the size of my final images and improved build times.
+
+    | Application 	| Old Size 	| New Size 	|
+    |-------------	|----------	|----------	|
+    | Frontend    	|  1.19 GB 	|  426 MB  	|
+    | Backend     	|  129 MB  	|  125 MB  	|
+
+- As we can see from the table, we can see that our frontend app image size decreased by approximately 65.14%, while the backend relatively stayed the same. I attached the proof down below (I would've attached the terminal only, but there would be no guarantee that I did it. Hence the URL :) ):
+
+![Logical Diagram (Application)](assets/week-1/old-size.png)
+<div align="center" style="font-weight: bold; margin-bottom:12px; padding-top:0px">Fig 1.0: Initial Size</div>
+
+
+![Logical Diagram (Application)](assets/week-1/new-size.png)
+<div align="center" style="font-weight: bold; margin-bottom:12px; padding-top:0px">Fig 1.1: Final Size</div>
+
+----------------------
+
+### Running the dockerfile CMD as an external script
+- This was one of the challenging things to understand as a question. When I saw ``CMD as an external script``, I thought about a lot of things. But two stand out and I've implemented them both on my dockerfiles.
+
+    1. Create a bash script that runs the command which was located within the CMD statement, then execute that shell script within CMD. I implemented this within my Backend App [Dockerfile](https://github.com/MannyNe/AWS-bootcamp/blob/week-1/backend-flask/Dockerfile). Take a peek below :)
+
+    ```
+    .
+    .
+    .
+    # Run the command to start Flask
+    CMD [ "bash", "./init.sh" ]
+    ```
+    2. Create a bash script that runs the command which was located within the CMD statement, then execute it using an ENTRYPOINT command. I implemented this within my Frontend App [Dockerfile](https://github.com/MannyNe/AWS-bootcamp/blob/week-1/frontend-react-js/Dockerfile). Take a peek below :)
+
+    ```
+    .
+    .
+    .
+    # Set the entrypoint command to run the script
+    ENTRYPOINT ["bash", "./init.sh"]
+    ```
+
+----------------------
+### Implement a healthcheck in the V3 Docker compose file
+
+----------------------
+### Learn how to install Docker on your localmachine and get the same containers running outside of Gitpod / Codespaces
+
+----------------------
+### Push and tag a image to DockerHub
+
+----------------------
+### Launch an EC2 instance that has docker installed, and pull a container to demonstrate you can run your own docker processes
+
+----------------------
