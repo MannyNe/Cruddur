@@ -26,6 +26,12 @@ cors = CORS(
   methods="OPTIONS,GET,HEAD,POST"
 )
 
+# ADDED THIS ROUTE TO CHECK IF THE APP IS HEALTHY
+@app.route("/health", methods=['GET'])
+def health_check():
+  data = 'Healthy'
+  return data, 200
+
 @app.route("/api/message_groups", methods=['GET'])
 def data_message_groups():
   user_handle  = 'andrewbrown'
