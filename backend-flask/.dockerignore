@@ -1,0 +1,6 @@
+README.md
+.gitignore
+Dockerfile
+.env.example
+.git
+.npmrc
