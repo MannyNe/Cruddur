@@ -17,6 +17,10 @@ RUN npm ci --only=production
 FROM node:16.17.0-bullseye-slim
 
 COPY --from=build /usr/bin/dumb-init /usr/bin/dumb-init
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends curl && \
+    rm -rf /var/lib/apt/lists/* && \
+    apt-get clean
 
 # Securing the container by not running it using the root privilage
 USER node
