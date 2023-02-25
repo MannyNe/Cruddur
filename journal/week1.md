@@ -46,11 +46,11 @@
 
 - As we can see from the table, we can see that our frontend app image size decreased by approximately 63.87%, while the backend relatively stayed the same. I attached the proof down below (I would've attached the terminal only, but there would be no guarantee that I did it. Hence the URL :) ):
 
-![Logical Diagram (Application)](assets/week-1/old-size.png)
+![Old size of images](assets/week-1/old-size.png)
 <div align="center" style="font-weight: bold; margin-bottom:12px; padding-top:0px">Fig 1.0: Initial Size</div>
 
 
-![Logical Diagram (Application)](assets/week-1/new-size.png)
+![New size of images](assets/week-1/new-size.png)
 <div align="center" style="font-weight: bold; margin-bottom:12px; padding-top:0px">Fig 1.1: Final Size</div>
 
 ----------------------
@@ -123,10 +123,24 @@ services:
 - [Here's](https://github.com/MannyNe/AWS-bootcamp/blob/week-1/docker-compose.yaml) the link for the file which contains healthchecks for each service except dynamodb which gave me some issues while implementing it.
 ----------------------
 ### Learn how to install Docker on your localmachine and get the same containers running outside of Gitpod / Codespaces
-- 
+- I already had Docker Desktop installed before because I do some work with it. I followed [Docker's official documentation](https://docs.docker.com/desktop/install/windows-install/) on how to install the Windows edition. All I had to do next was run the command ``docker-compose up -d`` in my local copy of my repository. I attached the proof below.
+
+![Docker Desktop](assets/week-1/Docker-Desktop.png)
+<div align="center" style="font-weight: bold; margin-bottom:12px; padding-top:0px">Fig 1.0: Docker Desktop with containers running</div>
+
+![Locally deployed crudder](assets/week-1/local-crudder.png)
+<div align="center" style="font-weight: bold; margin-bottom:12px; padding-top:0px">Fig 1.1: Locally running cruddr</div>
 
 ----------------------
 ### Push and tag an image to DockerHub
+- I used a tutorial posted by [Bharathiraja](https://bharathirajatut.medium.com/about) in medium, whom is an AWS DevOps engineer. I pushed my backend-flask app by tagging and pushing it to my DockerHub repo. Here's the [link](https://medium.com/codex/dockerfile-explained-dockerize-nodejs-application-411dadbc3412) to Bharathiraja's tutorial. Here is the proof that I tagged and pushed my image to DockerHub:
+
+![Docker CLI that shows image pushing](assets/week-1/DockerHub-CLI.png)
+<div align="center" style="font-weight: bold; margin-bottom:12px; padding-top:0px">Fig 1.0: Docker-CLI for pushing image</div>
+
+
+![DockerHub](assets/week-1/DockerHub.png)
+<div align="center" style="font-weight: bold; margin-bottom:12px; padding-top:0px">Fig 1.1: DockerHub showing pushed image</div>
 
 ----------------------
 ### Launch an EC2 instance that has docker installed, and pull a container to demonstrate you can run your own docker processes
