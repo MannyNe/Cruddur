@@ -16,7 +16,7 @@
     - [X] Running the dockerfile CMD as an external script.
     - [X] Implement a healthcheck in the V3 Docker compose file.
     - [X] Learn how to install Docker on your localmachine and get the same containers running outside of Gitpod / Codespaces.
-    - [] Push and tag a image to DockerHub.
+    - [] Push and tag an image to DockerHub.
     - [] Launch an EC2 instance that has docker installed, and pull a container to demonstrate you can run your own docker processes. 
 
 - I will describe my work and the process I overcame in the order provided above.
@@ -41,10 +41,10 @@
 
     | Application 	| Old Size 	| New Size 	|
     |-------------	|----------	|----------	|
-    | Frontend    	|  1.19 GB 	|  426 MB  	|
+    | Frontend    	|  1.19 GB 	|  430 MB  	|
     | Backend     	|  129 MB  	|  125 MB  	|
 
-- As we can see from the table, we can see that our frontend app image size decreased by approximately 65.14%, while the backend relatively stayed the same. I attached the proof down below (I would've attached the terminal only, but there would be no guarantee that I did it. Hence the URL :) ):
+- As we can see from the table, we can see that our frontend app image size decreased by approximately 63.87%, while the backend relatively stayed the same. I attached the proof down below (I would've attached the terminal only, but there would be no guarantee that I did it. Hence the URL :) ):
 
 ![Logical Diagram (Application)](assets/week-1/old-size.png)
 <div align="center" style="font-weight: bold; margin-bottom:12px; padding-top:0px">Fig 1.0: Initial Size</div>
@@ -65,7 +65,7 @@
     .
     .
     # Run the command to start Flask
-    CMD [ "bash", "./init.sh" ]
+    CMD [ "bash", "./init-backend.sh" ]
     ```
     2. Create a bash script that runs the command which was located within the CMD statement, then execute it using an ENTRYPOINT command. I implemented this within my Frontend App [Dockerfile](https://github.com/MannyNe/AWS-bootcamp/blob/week-1/frontend-react-js/Dockerfile) and created a script file called [init-frontend.sh](https://github.com/MannyNe/AWS-bootcamp/blob/week-1/frontend-react-js/init-frontend.sh). Take a peek below :)
 
@@ -74,17 +74,59 @@
     .
     .
     # Set the entrypoint command to run the script
-    ENTRYPOINT ["bash", "./init.sh"]
+    ENTRYPOINT ["bash", "./init-frontend.sh"]
     ```
 
 ----------------------
 ### Implement a healthcheck in the V3 Docker compose file
+- When I first got introduced to docker and its containerization system, I wondered how it would insure its reliability and stability of the containers. There was this twitter post about it and how to integrate it. I wish I could find the tweet and credit him/her for this. I probably might edit this later if I do find that tweet. I modified the backend code to include a healthcheck route so that I could check if the API works fine instead of adding curl to the image which would increase the filesize of my image. The snippet below shows the new `docker-compose.yaml` file that has a healthcheck for all the services within it. 
 
+```
+version: "3.8"
+services:
+  backend-flask:
+    container_name: "backend_flask"
+    environment:
+      FRONTEND_URL: "https://3000-${GITPOD_WORKSPACE_ID}.${GITPOD_WORKSPACE_CLUSTER_HOST}"
+      BACKEND_URL: "https://4567-${GITPOD_WORKSPACE_ID}.${GITPOD_WORKSPACE_CLUSTER_HOST}"
+    build: ./backend-flask
+    ports:
+      - "4567:4567"
+    volumes:
+      - ./backend-flask:/backend-flask
+    healthcheck:
+      test: ["CMD-SHELL", "./health-check.sh"]
+      interval: 60s
+      retries: 5
+      start_period: 20s
+      timeout: 5s
+  frontend-react-js:
+    container_name: "frontend-react-js"
+    environment:
+      REACT_APP_BACKEND_URL: "https://4567-${GITPOD_WORKSPACE_ID}.${GITPOD_WORKSPACE_CLUSTER_HOST}"
+    build: ./frontend-react-js
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend-react-js:/frontend-react-js
+      - /frontend-react-js/node_modules
+    healthcheck:
+      test: curl --fail http://localhost:3000 || exit 1
+      interval: 60s
+      retries: 5
+      start_period: 20s
+      timeout: 5s
+      .
+      .
+      .
+```
+- [Here's](https://github.com/MannyNe/AWS-bootcamp/blob/week-1/docker-compose.yaml) the link for the file which contains healthchecks for each service except dynamodb which gave me some issues while implementing it.
 ----------------------
 ### Learn how to install Docker on your localmachine and get the same containers running outside of Gitpod / Codespaces
+- 
 
 ----------------------
-### Push and tag a image to DockerHub
+### Push and tag an image to DockerHub
 
 ----------------------
 ### Launch an EC2 instance that has docker installed, and pull a container to demonstrate you can run your own docker processes
