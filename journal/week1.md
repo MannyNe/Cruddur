@@ -16,7 +16,7 @@
     - [X] Running the dockerfile CMD as an external script.
     - [X] Implement a healthcheck in the V3 Docker compose file.
     - [X] Learn how to install Docker on your localmachine and get the same containers running outside of Gitpod / Codespaces.
-    - [] Push and tag an image to DockerHub.
+    - [X] Push and tag an image to DockerHub.
     - [] Launch an EC2 instance that has docker installed, and pull a container to demonstrate you can run your own docker processes. 
 
 - I will describe my work and the process I overcame in the order provided above.
@@ -144,5 +144,88 @@ services:
 
 ----------------------
 ### Launch an EC2 instance that has docker installed, and pull a container to demonstrate you can run your own docker processes
+- I launched an EC2 instance by following AWS' official [documenation](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/EC2_GetStarted.html). It was a straight forward process and I didnt have a hard time with deploying it. The deployed instance proof is attached below:
 
+![Docker CLI that shows image pushing](assets/week-1/EC2-Instance.jpg)
+***Note that this instance wont be available after I post this documentation because I dont want abuse lol***
+
+- Deploying docker on that instance was an easy feat because I already have installed docker on my local machine. After that, I had to do some modifications to my docker-compose file so that there wont be issues with the environment variables assigned for gitpod. The new docker-compose file looks like this after the change: 
+
+```
+version: "3.8"
+services:
+  backend-flask:
+    container_name: "backend_flask"
+    environment:
+      FRONTEND_URL: "http://localhost:3000"
+      BACKEND_URL: "http://localhost:4567"
+    build: ./backend-flask
+    ports:
+      - "4567:4567"
+    volumes:
+      - ./backend-flask:/backend-flask
+    healthcheck:
+      test: ["CMD-SHELL", "./health-check.sh"]
+      interval: 60s
+      retries: 5
+      start_period: 20s
+      timeout: 5s
+  frontend-react-js:
+    container_name: "frontend-react-js"
+    environment:
+      REACT_APP_BACKEND_URL: "http://localhost:4567"
+    build: ./frontend-react-js
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend-react-js:/frontend-react-js
+      - /frontend-react-js/node_modules
+    healthcheck:
+      test: curl --fail http://localhost:3000 || exit 1
+      interval: 60s
+      retries: 5
+      start_period: 20s
+      timeout: 5s
+  db:
+    image: postgres:13-alpine
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+    ports:
+      - '5432:5432'
+    volumes: 
+      - db:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 60s
+      timeout: 5s
+      retries: 5
+  dynamodb-local:
+    # https://stackoverflow.com/questions/67533058/persist-local-dynamodb-data-in-volumes-lack-permission-unable-to-open-databa
+    # We needed to add user:root to get this working.
+    user: root
+    command: "-jar DynamoDBLocal.jar -sharedDb -dbPath ./data"
+    image: "amazon/dynamodb-local:latest"
+    container_name: dynamodb-local
+    ports:
+      - "8000:8000"
+    volumes:
+      - "./docker/dynamodb:/home/dynamodblocal/data"
+    working_dir: /home/dynamodblocal
+
+# the name flag is a hack to change the default prepend folder
+# name when outputting the image names
+networks: 
+  internal-network:
+    driver: bridge
+    name: cruddur
+
+volumes:
+  db:
+    driver: local
+```
+- After this modification, all I had to do was build and spin up my containers using the command ``docker compose up -d --build``. After this, I waited to check if all my containers were up and healthy. and then voila, they were. The deployed docker containers are provided below:
+
+![Container status](assets/week-1/container-status.png)
 ----------------------
