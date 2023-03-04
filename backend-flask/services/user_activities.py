@@ -22,9 +22,9 @@ class UserActivities:
       }]
       model['data'] = results
     # AWS X-RAY
-    with xray_recorder.in_subsegment('user_activities') as subsegment:
-      subsegment.put_metadata('userhandle', user_handle,'user')
-      subsegment.put_metadata('time', now.isoformat(), 'user')
-      subsegment.put_metadata('result-size', len(model['data']), 'user')
+    #with xray_recorder.in_subsegment('user_activities') as subsegment:
+    #  subsegment.put_metadata('userhandle', user_handle,'user')
+    #  subsegment.put_metadata('time', now.isoformat(), 'user')
+    #  subsegment.put_metadata('result-size', len(model['data']), 'user')
       
     return model
