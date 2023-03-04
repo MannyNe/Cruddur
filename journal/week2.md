@@ -13,8 +13,8 @@
 ## Required Homework/Tasks (stretch)
 - To test if we grasped the concepts provided to us through the meeting as well as the provided videos to aid us, we were given homeworks. They are:
     - [X] Configure instrumentation with X-RAY and add segments and subsegments.
-    - [] Adding custom instrumentation to Honeycomb to add more attributes
-    - [] Running custom queries in Honeycomb and saving them later
+    - [X] Adding custom instrumentation to Honeycomb to add more attributes
+    - [X] Running custom queries in Honeycomb and saving them later
 
 
 - I will describe my work and the process I overcame in the order provided above.
@@ -62,5 +62,11 @@
 
 ------------------------
 
-### Running custom queries in Honeycomb and saving them later
-- 
+### Running custom queries in Honeycomb and saving them for later use
+- I ran a custom query based on the data I captured above, and saved that data for later use. The images below show the data recieved, queried and then saved:
+
+![Honeycomb saving query](assets/week-2/honeycomb-query-save.png)
+<div align="center" style="font-weight: bold; margin-bottom:12px; padding-top:0px">Fig 1.0: Saving Honeycomb Query </div>
+
+![Honeycomb console for queries](assets/week-2/honeycomb-query-console.png)
+<div align="center" style="font-weight: bold; margin-bottom:12px; padding-top:0px">Fig 1.1: Saved Honeycomb Query with data </div>
