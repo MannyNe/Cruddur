@@ -41,11 +41,26 @@
 <div align="center" style="font-weight: bold; margin-bottom:12px; padding-top:0px">Fig 1.0: Traces in X-RAY </div>
 
 ![X-RAY Trace](assets/week-2/x-ray_segments.png)
-<div align="center" style="font-weight: bold; margin-bottom:12px; padding-top:0px">Fig 1.0: Segments and Subsegments in X-RAY with metadata </div>
+<div align="center" style="font-weight: bold; margin-bottom:12px; padding-top:0px">Fig 1.1: Segments and Subsegments in X-RAY with metadata </div>
 
-
+----------------------
 ### Adding custom instrumentation to Honeycomb to add more attributes
-- 
+- I added a custom instrumentation to add an attribute to the user activities route to see which user has the a large amount of data(activity) attached to his/her username. I added attributes called `now`, `user` and `result_length` to the `user_activities` file to check those data. Codes added: 
+```
+      span.set_attribute("app.now", now.isoformat())
+      span.set_attribute("app.user", user_handle)
+      span.set_attribute("app.result_length", len(model['data']))
+```
+- The full code can be found [here]()
+
+- Here's the proof for the data shown in Honeycomb:
+![X-RAY Traces](assets/week-2/honeycomb-home.png)
+<div align="center" style="font-weight: bold; margin-bottom:12px; padding-top:0px">Fig 1.0: Honeycomb Traces </div>
+
+![X-RAY Trace](assets/week-2/honeycomb-trace-data.png)
+<div align="center" style="font-weight: bold; margin-bottom:12px; padding-top:0px">Fig 1.1: Trace Data </div>
+
+------------------------
 
 ### Running custom queries in Honeycomb and saving them later
 - 
