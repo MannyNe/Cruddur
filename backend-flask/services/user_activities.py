@@ -1,11 +1,12 @@
 from datetime import datetime, timedelta, timezone
+from aws_xray_sdk.core import xray_recorder
+
 class UserActivities:
   def run(user_handle):
     model = {
       'errors': None,
       'data': None
     }
-
     now = datetime.now(timezone.utc).astimezone()
 
     if user_handle == None or len(user_handle) < 1:
@@ -20,4 +21,10 @@ class UserActivities:
         'expires_at': (now + timedelta(days=31)).isoformat()
       }]
       model['data'] = results
+    # AWS X-RAY
+    with xray_recorder.in_subsegment('user_activities') as subsegment:
+      subsegment.put_metadata('userhandle', user_handle,'user')
+      subsegment.put_metadata('time', now.isoformat(), 'user')
+      subsegment.put_metadata('result-size', len(model['data']), 'user')
+      
     return model
