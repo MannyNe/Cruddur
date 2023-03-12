@@ -25,8 +25,7 @@ EXPOSE ${PORT}
 
 # Define environment variables
 ENV FLASK_APP=app.py \
-    FLASK_ENV=production \
-    FLASK_DEBUG=0
+    FLASK_ENV=development
 
 # Run the command to start Flask
 CMD [ "bash", "./init-backend.sh" ]
