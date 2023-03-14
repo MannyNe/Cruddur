@@ -15,7 +15,8 @@ from services.messages import *
 from services.create_message import *
 from services.show_activity import *
 
-from lib.cognito_jwt_token import CognitoJwtToken, extract_access_token, TokenVerifyError
+# from lib.cognito_jwt_token import CognitoJwtToken, extract_access_token, TokenVerifyError
+from lib.cognito_jwt_token import CognitoJwtToken
 
 # AWS X-RAY
 from aws_xray_sdk.core import xray_recorder
@@ -31,6 +32,8 @@ import rollbar
 import rollbar.contrib.flask
 from flask import got_request_exception
 
+# TOKEN AUTHORIZING MIDDLEWARE
+from middleware.token_authorize import token_authorize
 
 # Configuring Logger to Use CloudWatch
 # LOGGER = logging.getLogger(__name__)
@@ -154,22 +157,33 @@ def data_create_message():
     return model['data'], 200
   return
 
+# ---   DEFAULT AUTHORIZAION   --- #
+#@app.route("/api/activities/home", methods=['GET'])
+#def data_home():
+#  # data = HomeActivities.run(logger=LOGGER)
+#  access_token = extract_access_token(request.headers)
+#  try:
+#    claims = cognito_jwt_token.verify(access_token)
+#    # authenicatied request
+#    app.logger.debug("authenicated")
+#    app.logger.debug(claims)
+#    app.logger.debug(claims['username'])
+#    data = HomeActivities.run(cognito_user_id=claims['username'])
+#  except TokenVerifyError as e:
+#    # unauthenicatied request
+#    app.logger.debug(e)
+#    app.logger.debug("unauthenicated")
+#    data = HomeActivities.run()
+#  return data, 200
+
+# ---   USING MIDDLEWARE FOR AUTHORIZATION   --- #
 @app.route("/api/activities/home", methods=['GET'])
-def data_home():
-  # data = HomeActivities.run(logger=LOGGER)
-  access_token = extract_access_token(request.headers)
-  try:
-    claims = cognito_jwt_token.verify(access_token)
-    # authenicatied request
-    app.logger.debug("authenicated")
-    app.logger.debug(claims)
-    app.logger.debug(claims['username'])
-    data = HomeActivities.run(cognito_user_id=claims['username'])
-  except TokenVerifyError as e:
-    # unauthenicatied request
-    app.logger.debug(e)
-    app.logger.debug("unauthenicated")
+@token_authorize(app, cognito_jwt_token)
+def data_home(claims):
+  if not claims:
     data = HomeActivities.run()
+  else:
+    data = HomeActivities.run(cognito_user_id=claims['username'])
   return data, 200
 
 @app.route("/api/activities/notifications", methods=['GET'])
