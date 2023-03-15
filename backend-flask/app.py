@@ -3,6 +3,7 @@ from flask import request
 from flask_cors import CORS, cross_origin
 import os
 import sys
+import requests
 
 from services.home_activities import *
 from services.notifications_activities import *
@@ -16,7 +17,7 @@ from services.create_message import *
 from services.show_activity import *
 
 # from lib.cognito_jwt_token import CognitoJwtToken, extract_access_token, TokenVerifyError
-from lib.cognito_jwt_token import CognitoJwtToken
+from lib.cognito_jwt_token import CognitoJwtToken, extract_access_token
 
 # AWS X-RAY
 from aws_xray_sdk.core import xray_recorder
@@ -78,6 +79,7 @@ RequestsInstrumentor().instrument()
 
 frontend = os.getenv('FRONTEND_URL')
 backend = os.getenv('BACKEND_URL')
+side_car_node = os.getenv('SIDE_CAR_NODE')
 origins = [frontend, backend]
 cors = CORS(
   app, 
@@ -177,13 +179,25 @@ def data_create_message():
 #  return data, 200
 
 # ---   USING MIDDLEWARE FOR AUTHORIZATION   --- #
+#@app.route("/api/activities/home", methods=['GET'])
+#@token_authorize(app, cognito_jwt_token)
+#def data_home(claims):
+#  if not claims:
+#    data = HomeActivities.run()
+#  else:
+#    data = HomeActivities.run(cognito_user_id=claims['username'])
+#  return data, 200
+
+# ---   USING NODE SIDE-CAR FOR AUTHORIZATION   --- #
 @app.route("/api/activities/home", methods=['GET'])
-@token_authorize(app, cognito_jwt_token)
-def data_home(claims):
-  if not claims:
-    data = HomeActivities.run()
+def data_home():
+  access_token = extract_access_token(request.headers)
+  response = requests.post(side_car_node, json={"token":access_token})
+  claims = response.json()
+  if 'payload' in claims:
+    data = HomeActivities.run(cognito_user_id=claims['payload'])
   else:
-    data = HomeActivities.run(cognito_user_id=claims['username'])
+    data = HomeActivities.run()
   return data, 200
 
 @app.route("/api/activities/notifications", methods=['GET'])

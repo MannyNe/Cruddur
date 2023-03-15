@@ -15,7 +15,8 @@ services:
       AWS_SECRET_ACCESS_KEY: "${AWS_SECRET_ACCESS_KEY}"
       ROLLBAR_ACCESS_TOKEN: "${ROLLBAR_ACCESS_TOKEN}"
       AWS_COGNITO_USER_POOL_ID: "us-east-1_37QFkM89e"
-      AWS_COGNITO_USER_POOL_CLIENT_ID: "6bg85ltcq257hve1mcktj0n2i2" 
+      AWS_COGNITO_USER_POOL_CLIENT_ID: "6bg85ltcq257hve1mcktj0n2i2"
+      SIDE_CAR_NODE: "http://side-car-node:6000/verify-token"
     build: ./backend-flask
     ports:
       - "4567:4567"
@@ -27,6 +28,18 @@ services:
       retries: 5
       start_period: 20s
       timeout: 5s
+  side-car-node:
+    container_name: "side-car-node"
+    environment:
+      AWS_COGNITO_USER_POOL_ID: "us-east-1_37QFkM89e"
+      AWS_COGNITO_USER_POOL_CLIENT_ID: "6bg85ltcq257hve1mcktj0n2i2"
+      AWS_TOKEN_USE: "access"
+    build: ./sidecars/node
+    ports:
+      - "6000:6000"
+    volumes:
+      - ./sidecars/node:/side-car-node
+      - /side-car-node/node_modules
   frontend-react-js:
     container_name: "frontend-react-js"
     environment:

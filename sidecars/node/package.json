@@ -1,0 +1,21 @@
+{
+  "name": "jwt-verify",
+  "version": "1.0.0",
+  "description": "sidecar pattern for verifiying JWT tokens.",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start:dev": "nodemon index.js",
+    "start:prod": "node index.js"
+  },
+  "author": "Manny Negussie",
+  "license": "ISC",
+  "dependencies": {
+    "aws-jwt-verify": "^3.4.0",
+    "fastify": "^4.14.1"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.21"
+  }
+}
