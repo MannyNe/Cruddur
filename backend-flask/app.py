@@ -2,6 +2,9 @@ from flask import Flask
 from flask import request
 from flask_cors import CORS, cross_origin
 import os
+import sys
+import requests
+import json
 
 from services.home_activities import *
 from services.notifications_activities import *
@@ -13,6 +16,9 @@ from services.message_groups import *
 from services.messages import *
 from services.create_message import *
 from services.show_activity import *
+
+# from lib.cognito_jwt_token import CognitoJwtToken, extract_access_token, TokenVerifyError
+from lib.cognito_jwt_token import CognitoJwtToken, extract_access_token
 
 # AWS X-RAY
 from aws_xray_sdk.core import xray_recorder
@@ -28,6 +34,8 @@ import rollbar
 import rollbar.contrib.flask
 from flask import got_request_exception
 
+# TOKEN AUTHORIZING MIDDLEWARE
+from middleware.token_authorize import token_authorize
 
 # Configuring Logger to Use CloudWatch
 # LOGGER = logging.getLogger(__name__)
@@ -57,6 +65,13 @@ tracer = trace.get_tracer(__name__)
 # xray_recorder.configure(service='backend-flask', dynamic_naming=xray_url)
 
 app = Flask(__name__)
+
+cognito_jwt_token = CognitoJwtToken(
+  user_pool_id=os.getenv("AWS_COGNITO_USER_POOL_ID"), 
+  user_pool_client_id=os.getenv("AWS_COGNITO_USER_POOL_CLIENT_ID"),
+  region=os.getenv("AWS_DEFAULT_REGION")
+)
+
 # XRayMiddleware(app, xray_recorder)
 
 # INITIALIZING AUTOMATIC INSTRUMENTATION
@@ -65,12 +80,14 @@ RequestsInstrumentor().instrument()
 
 frontend = os.getenv('FRONTEND_URL')
 backend = os.getenv('BACKEND_URL')
-origins = [frontend, backend]
+side_car_node = os.getenv('SIDE_CAR_NODE')
+side_car_url = os.getenv('SIDE_CAR_URL')
+origins = [frontend, backend, side_car_url]
 cors = CORS(
   app, 
   resources={r"/api/*": {"origins": origins}},
-  expose_headers="location,link",
-  allow_headers="content-type,if-modified-since",
+  headers=['Content-Type', 'Authorization'], 
+  expose_headers='Authorization',
   methods="OPTIONS,GET,HEAD,POST"
 )
 
@@ -144,10 +161,43 @@ def data_create_message():
     return model['data'], 200
   return
 
+# ---   DEFAULT AUTHORIZAION   --- #
+#@app.route("/api/activities/home", methods=['GET'])
+#def data_home():
+#  # data = HomeActivities.run(logger=LOGGER)
+#  access_token = extract_access_token(request.headers)
+#  try:
+#    claims = cognito_jwt_token.verify(access_token)
+#    # authenicatied request
+#    app.logger.debug("authenicated")
+#    app.logger.debug(claims)
+#    app.logger.debug(claims['username'])
+#    data = HomeActivities.run(cognito_user_id=claims['username'])
+#  except TokenVerifyError as e:
+#    # unauthenicatied request
+#    app.logger.debug(e)
+#    app.logger.debug("unauthenicated")
+#    data = HomeActivities.run()
+#  return data, 200
+
+# ---   USING MIDDLEWARE FOR AUTHORIZATION   --- #
+#@app.route("/api/activities/home", methods=['GET'])
+#@token_authorize(app, cognito_jwt_token)
+#def data_home(claims):
+#  if not claims:
+#    data = HomeActivities.run()
+#  else:
+#    data = HomeActivities.run(cognito_user_id=claims['username'])
+#  return data, 200
+
+# ---   USING NODE SIDE-CAR FOR AUTHORIZATION   --- #
 @app.route("/api/activities/home", methods=['GET'])
 def data_home():
-  # data = HomeActivities.run(logger=LOGGER)
-  data = HomeActivities.run()
+  if 'X-Claims' in request.headers:
+    claims = json.loads(request.headers.get("X-Claims"))
+    data = HomeActivities.run(cognito_user_id=claims['username'])
+  else:
+    data = HomeActivities.run()
   return data, 200
 
 @app.route("/api/activities/notifications", methods=['GET'])
