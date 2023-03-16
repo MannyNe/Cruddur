@@ -66,7 +66,35 @@ I used the following resources to help me with this task:
 .
 .
 .
-const fastify = require('fastify')({ logger: true })
+fastify.get('/api/activities/home', async (req, res) => {
+  if (req.headers.authorization) {
+    let token = req.headers.authorization.substring(req.headers.authorization.indexOf(' ') + 1);
+    if (token !== null || token !== 'null') {
+      try {
+        const payload = await verifier.verify(token)
+        const { data, status } = await fastify.axios.get(req.url, { headers: { 'x-claims': JSON.stringify(payload) } })
+        res.send(data)
+      } catch (err) {
+        // An error is thrown, so the JWT is not valid
+        // Use `instanceof` to test for specific error cases:
+        if (err instanceof JwtExpiredError) {
+          console.error("JWT expired!");
+        }
+        const { data, status } = await fastify.axios.get(req.url)
+        res.send(data)
+        throw err;
+      }
+    }
+    else {
+      const { data, status } = await fastify.axios.get(req.url)
+      res.send(data)
+    }
+  }
+  else {
+    const { data, status } = await fastify.axios.get(req.url)
+    res.send(data)
+  }
+})
 .
 .
 .
@@ -95,4 +123,10 @@ I used the following resources to help me with this task:
 ------------------------
 
 ### Implement MFA that send an SMS (text message)
-- 
+- Added the MFA to send an sms for authentication by modifying the MFA settings that was found within our pool under the sign-in experience. After adding a role for the SNS service, everything went perfect. I didn't look for help because the clickops for this process was easy. The proof for enabling the MFA is shown below:
+
+![MFA-1](assets/week-3/MFA-1.png)
+<div align="center" style="font-weight: bold; margin-bottom:12px; padding-top:0px">Fig 1.0: Within the MFA configuration </div>
+
+![MFA-2](assets/week-3/MFA-2.png)
+<div align="center" style="font-weight: bold; margin-bottom:12px; padding-top:0px">Fig 1.1: After enabling the MFA </div>
