@@ -1,10 +1,14 @@
 import Fastify from 'fastify'
+import * as fasAxios from 'fastify-axios'
 import { CognitoJwtVerifier } from "aws-jwt-verify";
 import { JwtExpiredError } from "aws-jwt-verify/error";
 
 // LOG REQUESTS
 const fastify = Fastify({
   logger: true
+})
+fastify.register(fasAxios, {
+  baseURL: process.env.BACKEND_URL
 })
 
 // CREATE OBJECT OF COGNITO JWT VERIFIER BY PROVIDING MANDATORY
@@ -15,10 +19,21 @@ const verifier = CognitoJwtVerifier.create({
     clientId: process.env.AWS_COGNITO_USER_POOL_CLIENT_ID,
 });
 
+fastify.get('/*', async (req,res) => {
+  const { data, status } = await fastify.axios.get(req.url)
+  res.send({ data, status })
+})
+
+fastify.post('/*', async (req,res) => {
+  const { data, status } = await fastify.axios.get(req.url)
+  res.send({ data, status })
+})
+
 // GET AUTHORIZATION BY SENDING TOKENS
 fastify.post('/verify-token', async (req, res) => {
     try {
-        console.log(req.body)
+        console.log(data)
+        console.log(req.url)
         const payload = await verifier.verify(req.body.token);
         res.send({ payload })
     } catch (err) {
