@@ -4,6 +4,7 @@ from flask_cors import CORS, cross_origin
 import os
 import sys
 import requests
+import json
 
 from services.home_activities import *
 from services.notifications_activities import *
@@ -80,7 +81,8 @@ RequestsInstrumentor().instrument()
 frontend = os.getenv('FRONTEND_URL')
 backend = os.getenv('BACKEND_URL')
 side_car_node = os.getenv('SIDE_CAR_NODE')
-origins = [frontend, backend]
+side_car_url = os.getenv('SIDE_CAR_URL')
+origins = [frontend, backend, side_car_url]
 cors = CORS(
   app, 
   resources={r"/api/*": {"origins": origins}},
@@ -191,11 +193,9 @@ def data_create_message():
 # ---   USING NODE SIDE-CAR FOR AUTHORIZATION   --- #
 @app.route("/api/activities/home", methods=['GET'])
 def data_home():
-  access_token = extract_access_token(request.headers)
-  response = requests.post(side_car_node, json={"token":access_token})
-  claims = response.json()
-  if 'payload' in claims:
-    data = HomeActivities.run(cognito_user_id=claims['payload'])
+  if 'X-Claims' in request.headers:
+    claims = json.loads(request.headers.get("X-Claims"))
+    data = HomeActivities.run(cognito_user_id=claims['username'])
   else:
     data = HomeActivities.run()
   return data, 200
