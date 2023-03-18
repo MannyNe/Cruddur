@@ -11,8 +11,8 @@ services:
       OTEL_SERVICE_NAME: 'backend-flask'
       OTEL_EXPORTER_OTLP_ENDPOINT: "https://api.honeycomb.io"
       OTEL_EXPORTER_OTLP_HEADERS: "x-honeycomb-team=${HONEYCOMB_API_KEY}"
-      AWS_XRAY_URL: "*4567-${GITPOD_WORKSPACE_ID}.${GITPOD_WORKSPACE_CLUSTER_HOST}*"
-      AWS_XRAY_DAEMON_ADDRESS: "xray-daemon:2000"
+      #AWS_XRAY_URL: "*4567-${GITPOD_WORKSPACE_ID}.${GITPOD_WORKSPACE_CLUSTER_HOST}*"
+      #AWS_XRAY_DAEMON_ADDRESS: "xray-daemon:2000"
       AWS_DEFAULT_REGION: "${AWS_DEFAULT_REGION}"
       AWS_ACCESS_KEY_ID: "${AWS_ACCESS_KEY_ID}"
       AWS_SECRET_ACCESS_KEY: "${AWS_SECRET_ACCESS_KEY}"
@@ -69,16 +69,16 @@ services:
       retries: 5
       start_period: 20s
       timeout: 5s
-  xray-daemon:
-    image: "amazon/aws-xray-daemon"
-    environment:
-      AWS_ACCESS_KEY_ID: "${AWS_ACCESS_KEY_ID}"
-      AWS_SECRET_ACCESS_KEY: "${AWS_SECRET_ACCESS_KEY}"
-      AWS_REGION: "us-east-1"
-    command:
-      - "xray -o -b xray-daemon:2000"
-    ports:
-      - 2000:2000
+  #xray-daemon:
+  #  image: "amazon/aws-xray-daemon"
+  #  environment:
+  #    AWS_ACCESS_KEY_ID: "${AWS_ACCESS_KEY_ID}"
+  #    AWS_SECRET_ACCESS_KEY: "${AWS_SECRET_ACCESS_KEY}"
+  #    AWS_REGION: "us-east-1"
+  #  command:
+  #    - "xray -o -b xray-daemon:2000"
+  #  ports:
+  #    - 2000:2000
   db:
     image: postgres:13-alpine
     restart: always
@@ -94,18 +94,18 @@ services:
       interval: 60s
       timeout: 5s
       retries: 5
-  dynamodb-local:
+  #dynamodb-local:
     # https://stackoverflow.com/questions/67533058/persist-local-dynamodb-data-in-volumes-lack-permission-unable-to-open-databa
     # We needed to add user:root to get this working.
-    user: root
-    command: "-jar DynamoDBLocal.jar -sharedDb -dbPath ./data"
-    image: "amazon/dynamodb-local:latest"
-    container_name: dynamodb-local
-    ports:
-      - "8000:8000"
-    volumes:
-      - "./docker/dynamodb:/home/dynamodblocal/data"
-    working_dir: /home/dynamodblocal
+  #  user: root
+  #  command: "-jar DynamoDBLocal.jar -sharedDb -dbPath ./data"
+  #  image: "amazon/dynamodb-local:latest"
+  #  container_name: dynamodb-local
+  #  ports:
+  #    - "8000:8000"
+  #  volumes:
+  #    - "./docker/dynamodb:/home/dynamodblocal/data"
+  #  working_dir: /home/dynamodblocal
 
 # the name flag is a hack to change the default prepend folder
 # name when outputting the image names
