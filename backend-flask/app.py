@@ -181,24 +181,24 @@ def data_create_message():
 #  return data, 200
 
 # ---   USING MIDDLEWARE FOR AUTHORIZATION   --- #
-#@app.route("/api/activities/home", methods=['GET'])
-#@token_authorize(app, cognito_jwt_token)
-#def data_home(claims):
-#  if not claims:
-#    data = HomeActivities.run()
-#  else:
-#    data = HomeActivities.run(cognito_user_id=claims['username'])
-#  return data, 200
+@app.route("/api/activities/home", methods=['GET'])
+@token_authorize(app, cognito_jwt_token)
+def data_home(claims):
+  if not claims:
+    data = HomeActivities.run()
+  else:
+    data = HomeActivities.run(cognito_user_id=claims['username'])
+  return data, 200
 
 # ---   USING NODE SIDE-CAR FOR AUTHORIZATION   --- #
-@app.route("/api/activities/home", methods=['GET'])
-def data_home():
-  if 'X-Claims' in request.headers:
-    claims = json.loads(request.headers.get("X-Claims"))
-    data = HomeActivities.run(cognito_user_id=claims['username'])
-  else:
-    data = HomeActivities.run()
-  return data, 200
+#@app.route("/api/activities/home", methods=['GET'])
+#def data_home():
+#  if 'X-Claims' in request.headers:
+#    claims = json.loads(request.headers.get("X-Claims"))
+#    data = HomeActivities.run(cognito_user_id=claims['username'])
+#  else:
+#    data = HomeActivities.run()
+#  return data, 200
 
 @app.route("/api/activities/notifications", methods=['GET'])
 def data_notifications():
