@@ -143,6 +143,69 @@ The full code can be found [here](https://github.com/MannyNe/AWS-bootcamp/blob/w
 ------------------------
 
 ### Connecting the RDS instance to Gitpod
+- After making sure the local development environment works, 
+we went to AWS RDS to strt up our database that we shut down in the livestream. Then, we connected the RDS instance to Gitpod by adding the following code to the `docker-compose.yml` file:
+
+```yml
+.
+.
+.
+  backend-flask:
+    container_name: "backend_flask"
+    environment:
+      CONNECTION_URL: "${PROD_CONNECTION_URL}"
+.
+.
+.
+```
+- The `PROD_CONNECTION_URL` is the connection url to the remote database. We added this to the `docker-compose.yml` file so that we can connect to the database from Gitpod. After adding this, we updated our security groups so that we could access our database from our local environment (Gitpod) by adding its IP address to the security group. We got our IP address by running the following command in the terminal:
+
+```bash
+$ GITPOD_ID=$(curl ifconfig.me)
+$ echo $GITPOD_ID
+```
+- Running the above command will give us our IP address. We then added this IP address to the security group of our database. But this is a one time solution because everytime our gitpod restarts, it gives us a new address, which the security-group will not be able to recognize. To solve this, we added a script called `rds-update-sg-rule.sh` to the `bin` directory. This script will update the security group of our database to allow access from our current IP address. The following is a snippet of the script:
+
+```bash
+#!/usr/bin/bash
+
+CYAN='\033[1;36m'
+NO_COLOR='\033[0m'
+LABEL="RDS-update-sg"
+printf "${CYAN}==> ${LABEL}${NO_COLOR}\n"
+
+aws ec2 modify-security-group-rules \
+    --group-id $DB_SG_ID \
+    --security-group-rules "SecurityGroupRuleId=$DB_SG_RULE_ID,SecurityGroupRule={Description=GITPOD,IpProtocol=tcp,FromPort=5432,ToPort=5432,CidrIpv4=$GITPOD_IP/32}"
+```
+- Before running this script, we need to set the following environment variables:
+
+```bash
+export GITPOD_IP
+export DB_SG_ID="security-group-ID"
+gp env DB_SG_ID="security-group-ID"
+export DB_SG_RULE_ID="security-group-rule-ID"
+gp env DB_SG_RULE_ID="security-group-rule-ID"
+```
+- After setting the environment variables, we ran the script to check if it worked, and it did. After that we configured the `.gitpod.yml` file to run the script everytime we start our gitpod instance. The following is a snippet of the `.gitpod.yml` file:
+
+```yml
+.
+.
+.
+tasks:
+  - name: aws-cli
+    env:
+      AWS_CLI_AUTO_PROMPT: on-partial
+  - name: update-ip
+    command: |
+      export GITPOD_IP=$(curl ifconfig.me)
+      source "$THEIA_WORKSPACE_ROOT/backend-flask/bin/rds-update-sg-rule"
+.
+.
+.
+```
+- After adding this, we restarted our gitpod instance and ran the script to check if it worked. It worked as expected. After this, we loaded our schema to the production database. Then we ran the application and it worked as expected. No errors, but an empty activities because we didn't have any data.
 
 ------------------------
 
