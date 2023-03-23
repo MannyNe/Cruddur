@@ -135,10 +135,7 @@ The code can be found [here](https://github.com/MannyNe/AWS-bootcamp/blob/week-4
 ```
 The full code can be found [here](https://github.com/MannyNe/AWS-bootcamp/blob/week-4/backend-flask/services/home_activities.py).
 
-- We used this code to query the activities from the database. Now before we can run the application, we need to create the database and load the schema into the database. We can do this by running the script found within the `bin` folder, called `db-schema-load.sh`. After loading our schema, seeding our database and passing the code-traps successfully, we ran the application and it worked as expected. The following is a screenshot of the application running:
-
-![Cruddur fetch activities](assets/week-4/Cruddur-home.png)
-<div align="center" style="font-weight: bold; margin-bottom:12px; padding-top:0px">Fig 1.0: The fetched crud (HomePage) </div>
+- We used this code to query the activities from the database. Now before we can run the application, we need to create the database and load the schema into the database. We can do this by running the script found within the `bin` folder, called `db-schema-load.sh`. After loading our schema, seeding our database and passing the code-traps successfully, we ran the application and it worked as expected.
 
 ------------------------
 
@@ -210,6 +207,94 @@ tasks:
 ------------------------
 
 ### Created AWS Cognito trigger to insert user into database
+- We created a trigger in AWS Cognito to insert a user into the database when a user signs up. To do that, we went to AWS to create a lambda function. We configured the lambda function through ClickOps then I added the VPC then and there because the lambda will need the security group of the database to be able to connect to it for post confirmation. After that we added the environment variables needed as well as add a layer to the lambda from the `arn` provided to us in the week-4 documentation. I'm currently in the us-east region so I used the `us-east-1` arn. After adding the layer, we created a new file within the `aws` folder called `cruddur-post-confirmation.py` to add the code we would add to the lambda later. The following is a snippet of the code:
+
+```python
+import json
+import psycopg2
+import os
+
+def lambda_handler(event, context):
+    user = event['request']['userAttributes']
+    print('userAttributes')
+    print(user)
+
+    user_display_name  = user['name']
+    user_email         = user['email']
+    user_handle        = user['preferred_username']
+    user_cognito_id    = user['sub']
+    try:
+      print('entered-try')
+      sql = f"""
+         INSERT INTO public.users (
+          display_name, 
+          email,
+          handle, 
+          cognito_user_id
+          ) 
+        VALUES(
+          '{user_display_name}', 
+          '{user_email}', 
+          '{user_handle}', 
+          '{user_cognito_id}'
+        )
+      """
+      print('SQL Statement ----')
+      print(sql)
+      conn = psycopg2.connect(os.getenv('CONNECTION_URL'))
+      cur = conn.cursor()
+      cur.execute(sql)
+      conn.commit() 
+
+    except (Exception, psycopg2.DatabaseError) as error:
+      print(error)
+    finally:
+      if conn is not None:
+          cur.close()
+          conn.close()
+          print('Database connection closed.')
+    return event
+```
+The code can be found [here](https://github.com/MannyNe/AWS-bootcamp/blob/week-4/aws/lambdas/cruddur-post-confirmation.py).
+
+- After that, we updated out schema.sql file to add the `email` column to the `users` table, as well as introduced more changes. The following is a snippet of the updated schema:
+
+```sql
+CREATE TABLE public.users (
+  uuid UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+  display_name text NOT NULL,
+  handle text NOT NULL,
+  email text NOT NULL,
+  cognito_user_id text NOT NULL,
+  created_at TIMESTAMP default current_timestamp NOT NULL
+);
+
+CREATE TABLE public.activities (
+  uuid UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+  user_uuid UUID NOT NULL,
+  message text NOT NULL,
+  replies_count integer DEFAULT 0,
+  reposts_count integer DEFAULT 0,
+  likes_count integer DEFAULT 0,
+  reply_to_activity_uuid integer,
+  expires_at TIMESTAMP,
+  created_at TIMESTAMP default current_timestamp NOT NULL
+);
+```
+The code can be found [here](https://github.com/MannyNe/AWS-bootcamp/blob/week-4/backend-flask/db/schema.sql).
+
+- After configuring the code and schema, we added the trigger to the post confirmation trigger. After adding the trigger, we added the code in the  `cruddur-post-confirmation.py` file to the lambda editor to deploy it. After deployment, we tested it by signing up a new user. First we checked the logs if everything went well according to lambda and cloud watch, which it did:
+
+![Cloudwatch log dashboard](assets/week-4/cloudwatch-1.jpg)
+<div align="center" style="font-weight: bold; margin-bottom:12px; padding-top:0px">Fig 1.0: Cloudwatch log dashboard </div>
+
+![Cloudwatch log](assets/week-4/cloudwatch-2.jpg)
+<div align="center" style="font-weight: bold; margin-bottom:12px; padding-top:0px">Fig 1.1: Cloudwatch log </div>
+
+And user was successfully added to the database. The following is a screenshot of the user in the database:
+
+![Database query result](assets/week-4/RDS-CLI.png)
+<div align="center" style="font-weight: bold; margin-bottom:12px; padding-top:0px">Fig 1.2: Production Database Query </div>
 
 ------------------------
 
