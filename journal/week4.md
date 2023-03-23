@@ -12,7 +12,7 @@
 - I will describe my work and the process in the order provided above.
 
 ### Create an RDS Database via the AWS CLI
-- To create an RDS database, I used the AWS CLI. I followed the steps provided by Andrew in the [livestream]() which showed us how to create an RDS instance through ClickOps as well as using the CLI. The CLI is easier to create and use because AWS keeps on changing the UI (which is annoying). The following is a snippet for the code (script) I used:
+- To create an RDS database, I used the AWS CLI. I followed the steps provided by Andrew in the [livestream](https://youtu.be/EtD7Kv5YCUs?list=PLBfufR7vyJJ7k25byhRXJldB5AiwgNnWv) which showed us how to create an RDS instance through ClickOps as well as using the CLI. The CLI is easier to create and use because AWS keeps on changing the UI (which is annoying). The following is a snippet for the code (script) I used:
 
 ```bash
 #!/bin/bash
@@ -37,11 +37,40 @@ aws rds create-db-instance \
   --performance-insights-retention-period 7 \
   --no-deletion-protection
 ```
-- The only thing that I changed from the spreipt provided was that I used the GP3 Storage Type instead of the default GP2.
+- The only thing that I changed from the script provided was that I used the GP3 Storage Type instead of the default GP2, as well as change my reigon.
 
 ----------------------
 
 ### Create common bash scripts for common database tasks
+- According to the livestream, we created sql files to create the database and tables. I created a script to load those tables to the database. Becasue flask doesn't handle(create) migrations, we had to create a scripts to do that. We created 5 scripts to handle modifications and connections to the database. We created a folder named `bin` found within the `backend-flask` folder and stored the scripts there. The following is are descriptions for the scripts:
+
+    * `db-connect.sh` - This script is used to connect to the database. It takes in the database type as an optional argument. The script is used to connect to the database and run sql scripts or commands.
+    * `db-create.sh` - This script is used to create the database `cruddur`.
+    * `db-drop.sh` - This script is used to drop the database `cruddur`.
+    * `db-schema-load.sh` - This script is used to load the schema into the database. It takes in the database type as an optional argument. The script is used to load the schema which is found within `db/schema.sql` into the database.
+    * `db-seed.sh` - This script is used to seed the database. It takes in the database type as an optional argument. The script is used to seed the database by loading the seed data which is found within `db/seed.sql` into the database.
+
+- The following is a snippet of the `db-schema-load.sh` script:
+  
+```bash
+  #!/usr/bin/bash
+
+  CYAN='\033[1;36m'
+  NO_COLOR='\033[0m'
+  LABEL="db-schema-load"
+  printf "${CYAN}==> ${LABEL}${NO_COLOR}\n"
+
+  schema_path="$(realpath .)/db/schema.sql"
+
+  if [ "$1" = "prod" ]; then
+      CON_URL=$PROD_CONNECTION_URL
+  else
+      CON_URL=$CONNECTION_URL
+  fi
+
+  psql $CON_URL cruddur < $schema_path
+```
+The script directory can be found [here](https://github.com/MannyNe/AWS-bootcamp/tree/week-4/backend-flask/bin).
 
 ------------------------
 
