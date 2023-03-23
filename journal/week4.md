@@ -74,11 +74,71 @@ The script directory can be found [here](https://github.com/MannyNe/AWS-bootcamp
 
 ------------------------
 
-### Implement MFA that send an SMS (text message)
-
-------------------------
-
 ### Installing Postgres in the backend application
+- I wouldn't call this step "installing" Postgres, but rather "connecting" or "configuring" Postgres to the backend application. I say this because we added the Postgres container/image to our docker file on `week-1`, where we learnt about Docker. The first thing I did was to add the `psycopg3` package to the `requirements.txt` file. We added the `binary` as well as the `pool` versions. This package is used to connect to the database. After installing the package, I created a new file called `db.py` within the `lib` directory and added the following code to it to help us format the output of the database queries:
+
+```python
+from psycopg_pool import ConnectionPool
+import os
+
+def query_wrap_object(template):
+  sql = f"""
+  (SELECT COALESCE(row_to_json(object_row),'{{}}'::json) FROM (
+  {template}
+  ) object_row);
+  """
+  return sql
+
+def query_wrap_array(template):
+  sql = f"""
+  (SELECT COALESCE(array_to_json(array_agg(row_to_json(array_row))),'[]'::json) FROM (
+  {template}
+  ) array_row);
+  """
+  return sql
+
+connection_url = os.getenv("CONNECTION_URL")
+pool = ConnectionPool(connection_url)
+```
+The code can be found [here](https://github.com/MannyNe/AWS-bootcamp/blob/week-4/backend-flask/lib/db.py).
+
+- After adding this file, we went on and modified the existing code in the `home_activity.py` file to help us query the activities which are located in the database:
+
+```python
+.
+.
+.
+      sql = query_wrap_array("""
+        SELECT
+          activities.uuid,
+          users.display_name,
+          users.handle,
+          activities.message,
+          activities.replies_count,
+          activities.reposts_count,
+          activities.likes_count,
+          activities.reply_to_activity_uuid,
+          activities.expires_at,
+          activities.created_at
+        FROM public.activities
+        LEFT JOIN public.users ON users.uuid = activities.user_uuid
+        ORDER BY activities.created_at DESC
+      """)
+      with pool.connection() as conn:
+        with conn.cursor() as cur:
+          cur.execute(sql)
+          # this will return a tuple
+          # the first field being the data
+          json = cur.fetchone()
+
+      return json[0]
+```
+The full code can be found [here](https://github.com/MannyNe/AWS-bootcamp/blob/week-4/backend-flask/services/home_activities.py).
+
+- We used this code to query the activities from the database. Now before we can run the application, we need to create the database and load the schema into the database. We can do this by running the script found within the `bin` folder, called `db-schema-load.sh`. After loading our schema, seeding our database and passing the code-traps successfully, we ran the application and it worked as expected. The following is a screenshot of the application running:
+
+![Cruddur fetch activities](assets/week-4/Cruddur-home.png)
+<div align="center" style="font-weight: bold; margin-bottom:12px; padding-top:0px">Fig 1.0: The fetched crud (HomePage) </div>
 
 ------------------------
 
