@@ -299,3 +299,7 @@ And user was successfully added to the database. The following is a screenshot o
 ------------------------
 
 ### Created new activities with a database insert
+- I created a new activity following the steps in the video from the [Week 4 - Creating Activities](https://www.youtube.com/watch?v=fTksxEQExL4&list=PLBfufR7vyJJ7k25byhRXJldB5AiwgNnWv&index=49). But this step was one of the harderst(in terms of code traps). I had to do a lot of debugging to get it to work. I had to replace the hard coded usernames and all from the backend as well as frontend files. I encountered the NON-NULL error because it was trying to fetch a user which wasnt the hardcoded user. After correcting the hardcoded values to be fetched from the frontend as well as from the database, I was able to post a crud. The following is a screenshot of the cruds I posted:
+
+![Database query result](assets/week-4/Cruddur-working-activities.png)
+<div align="center" style="font-weight: bold; margin-bottom:12px; padding-top:0px">Fig 1.0: Cruddur Homepage including cruds </div>
