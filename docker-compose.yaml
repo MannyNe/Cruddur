@@ -3,12 +3,14 @@ services:
   backend-flask:
     container_name: "backend_flask"
     environment:
-      CONNECTION_URL: "${PROD_CONNECTION_URL}"
+      #CONNECTION_URL: "${PROD_CONNECTION_URL}"
+      AWS_ENDPOINT_URL: "http://dynamodb-local:8000"
+      CONNECTION_URL: "postgresql://postgres:password@db:5432/cruddur"
       FRONTEND_URL: "https://3000-${GITPOD_WORKSPACE_ID}.${GITPOD_WORKSPACE_CLUSTER_HOST}"
       BACKEND_URL: "https://4567-${GITPOD_WORKSPACE_ID}.${GITPOD_WORKSPACE_CLUSTER_HOST}"
       #FRONTEND_URL: "https://${CODESPACE_NAME}-3000.${GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN}"
       #BACKEND_URL: "https://${CODESPACE_NAME}-4567.${GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN}"
-      SIDE_CAR_URL: "https://6000-${GITPOD_WORKSPACE_ID}.${GITPOD_WORKSPACE_CLUSTER_HOST}"
+      #SIDE_CAR_URL: "https://6000-${GITPOD_WORKSPACE_ID}.${GITPOD_WORKSPACE_CLUSTER_HOST}"
       OTEL_SERVICE_NAME: 'backend-flask'
       OTEL_EXPORTER_OTLP_ENDPOINT: "https://api.honeycomb.io"
       OTEL_EXPORTER_OTLP_HEADERS: "x-honeycomb-team=${HONEYCOMB_API_KEY}"
@@ -20,7 +22,7 @@ services:
       ROLLBAR_ACCESS_TOKEN: "${ROLLBAR_ACCESS_TOKEN}"
       AWS_COGNITO_USER_POOL_ID: "us-east-1_37QFkM89e"
       AWS_COGNITO_USER_POOL_CLIENT_ID: "6bg85ltcq257hve1mcktj0n2i2"
-      SIDE_CAR_NODE: "http://side-car-node:6000/verify-token"
+      #SIDE_CAR_NODE: "http://side-car-node:6000/verify-token"
     build: ./backend-flask
     ports:
       - "4567:4567"
@@ -32,19 +34,19 @@ services:
       retries: 5
       start_period: 20s
       timeout: 5s
-  side-car-node:
-    container_name: "side-car-node"
-    environment:
-      AWS_COGNITO_USER_POOL_ID: "us-east-1_37QFkM89e"
-      AWS_COGNITO_USER_POOL_CLIENT_ID: "6bg85ltcq257hve1mcktj0n2i2"
-      AWS_TOKEN_USE: "access"
-      BACKEND_URL: "https://4567-${GITPOD_WORKSPACE_ID}.${GITPOD_WORKSPACE_CLUSTER_HOST}"
-    build: ./sidecars/node
-    ports:
-      - "6000:6000"
-    volumes:
-      - ./sidecars/node:/side-car-node
-      - /side-car-node/node_modules
+  #side-car-node:
+  #  container_name: "side-car-node"
+  #  environment:
+  #    AWS_COGNITO_USER_POOL_ID: "us-east-1_37QFkM89e"
+  #    AWS_COGNITO_USER_POOL_CLIENT_ID: "6bg85ltcq257hve1mcktj0n2i2"
+  #    AWS_TOKEN_USE: "access"
+  #    BACKEND_URL: "https://4567-${GITPOD_WORKSPACE_ID}.${GITPOD_WORKSPACE_CLUSTER_HOST}"
+  #  build: ./sidecars/node
+  #  ports:
+  #    - "6000:6000"
+  #  volumes:
+  #    - ./sidecars/node:/side-car-node
+  #    - /side-car-node/node_modules
   frontend-react-js:
     container_name: "frontend-react-js"
     environment:
