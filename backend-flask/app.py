@@ -6,6 +6,7 @@ import sys
 import requests
 import json
 
+from services.users_short import *
 from services.home_activities import *
 from services.notifications_activities import *
 from services.user_activities import *
@@ -17,8 +18,8 @@ from services.messages import *
 from services.create_message import *
 from services.show_activity import *
 
-# from lib.cognito_jwt_token import CognitoJwtToken, extract_access_token, TokenVerifyError
-from lib.cognito_jwt_token import CognitoJwtToken, extract_access_token
+from lib.cognito_jwt_token import CognitoJwtToken, extract_access_token, TokenVerifyError
+# from lib.cognito_jwt_token import CognitoJwtToken, extract_access_token
 
 # AWS X-RAY
 from aws_xray_sdk.core import xray_recorder
@@ -80,9 +81,10 @@ RequestsInstrumentor().instrument()
 
 frontend = os.getenv('FRONTEND_URL')
 backend = os.getenv('BACKEND_URL')
-side_car_node = os.getenv('SIDE_CAR_NODE')
-side_car_url = os.getenv('SIDE_CAR_URL')
-origins = [frontend, backend, side_car_url]
+#side_car_node = os.getenv('SIDE_CAR_NODE')
+#side_car_url = os.getenv('SIDE_CAR_URL')
+#origins = [frontend, backend, side_car_url]
+origins = [frontend, backend]
 cors = CORS(
   app, 
   resources={r"/api/*": {"origins": origins}},
@@ -128,38 +130,83 @@ def health_check():
 
 @app.route("/api/message_groups", methods=['GET'])
 def data_message_groups():
-  user_handle  = 'andrewbrown'
-  model = MessageGroups.run(user_handle=user_handle)
-  if model['errors'] is not None:
-    return model['errors'], 422
-  else:
-    return model['data'], 200
+  access_token = extract_access_token(request.headers)
+  try:
+    claims = cognito_jwt_token.verify(access_token)
+    # authenicatied request
+    app.logger.debug("authenicated")
+    app.logger.debug(claims)
+    cognito_user_id = claims['sub']
+    model = MessageGroups.run(cognito_user_id=cognito_user_id)
+    app.logger.debug(model)
+    if model['errors'] is not None:
+      return model['errors'], 422
+    else:
+      return model['data'], 200
+  except TokenVerifyError as e:
+    # unauthenicatied request
+    app.logger.debug(e)
+    return {}, 401
 
-@app.route("/api/messages/@<string:handle>", methods=['GET'])
-def data_messages(handle):
-  user_sender_handle = 'andrewbrown'
-  user_receiver_handle = request.args.get('user_reciever_handle')
-
-  model = Messages.run(user_sender_handle=user_sender_handle, user_receiver_handle=user_receiver_handle)
-  if model['errors'] is not None:
-    return model['errors'], 422
-  else:
-    return model['data'], 200
-  return
+@app.route("/api/messages/<string:message_group_uuid>", methods=['GET'])
+def data_messages(message_group_uuid):
+  access_token = extract_access_token(request.headers)
+  try:
+    claims = cognito_jwt_token.verify(access_token)
+    # authenicatied request
+    app.logger.debug("authenicated")
+    app.logger.debug(claims)
+    cognito_user_id = claims['sub']
+    model = Messages.run(
+        cognito_user_id=cognito_user_id,
+        message_group_uuid=message_group_uuid
+      )
+    if model['errors'] is not None:
+      return model['errors'], 422
+    else:
+      return model['data'], 200
+  except TokenVerifyError as e:
+    # unauthenicatied request
+    app.logger.debug(e)
+    return {}, 401
 
 @app.route("/api/messages", methods=['POST','OPTIONS'])
 @cross_origin()
 def data_create_message():
-  user_sender_handle = 'andrewbrown'
-  user_receiver_handle = request.json['user_receiver_handle']
+  message_group_uuid   = request.json.get('message_group_uuid',None)
+  user_receiver_handle = request.json.get('handle',None)
   message = request.json['message']
-
-  model = CreateMessage.run(message=message,user_sender_handle=user_sender_handle,user_receiver_handle=user_receiver_handle)
-  if model['errors'] is not None:
-    return model['errors'], 422
-  else:
-    return model['data'], 200
-  return
+  access_token = extract_access_token(request.headers)
+  try:
+    claims = cognito_jwt_token.verify(access_token)
+    # authenicatied request
+    app.logger.debug("authenicated")
+    app.logger.debug(claims)
+    cognito_user_id = claims['sub']
+    if message_group_uuid == None:
+      # Create for the first time
+      model = CreateMessage.run(
+        mode="create",
+        message=message,
+        cognito_user_id=cognito_user_id,
+        user_receiver_handle=user_receiver_handle
+      )
+    else:
+      # Push onto existing Message Group
+      model = CreateMessage.run(
+        mode="update",
+        message=message,
+        message_group_uuid=message_group_uuid,
+        cognito_user_id=cognito_user_id
+      )
+    if model['errors'] is not None:
+      return model['errors'], 422
+    else:
+      return model['data'], 200
+  except TokenVerifyError as e:
+    # unauthenicatied request
+    app.logger.debug(e)
+    return {}, 401
 
 # ---   DEFAULT AUTHORIZAION   --- #
 #@app.route("/api/activities/home", methods=['GET'])
@@ -252,6 +299,11 @@ def data_activities_reply(activity_uuid):
   else:
     return model['data'], 200
   return
+
+@app.route("/api/users/@<string:handle>/short", methods=['GET'])
+def data_users_short(handle):
+  data = UsersShort.run(handle)
+  return data, 200
 
 if __name__ == "__main__":
   app.run(debug=True)
