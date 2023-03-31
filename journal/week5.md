@@ -233,6 +233,8 @@
     <div align="center" style="font-weight: bold; margin-bottom:12px; padding-top:0px">Fig 1.4: get-conversation</div>
 
 
+------------------------
+
 ### Implementing the updating of the Cognito ID Script for Postgres Database, listing messages group into application(for all patterns) and creating a message for an existing message group into application(for all patterns).
 This section of the classwork was one of the hardest, as well as the most challenging code-traps I had to go through. This is the second most challenging week I faced apart from week-3. I'll list the challenges I faced and how I overcame them.
 
@@ -406,5 +408,16 @@ This section of the classwork was one of the hardest, as well as the most challe
     <div align="center" style="font-weight: bold; margin-bottom:12px; padding-top:0px">Fig 1.1: New message sent to Londo</div>
 
 
+------------------------
+
 ###  Implementing the updating of a Message Group using DynamoDB Streams
-- 
+- This part of the summary was the most straightforward and easy parts of the whole class summary. The reason I say this was we did the hard part in the stage before this when we updated our code to handle the messages and all. In this step, we added a new lambda function that will capture streams that would update message groups. After following the video by Andrew, I was able to succesfully send messages as well as capture streams and save messages to the DB. The following is a screenshot of the new message I sent to londo in the production environment:
+
+    ![Message between Londo and I](assets/week-5/londo-prod.png)
+    <div align="center" style="font-weight: bold; margin-bottom:12px; padding-top:0px">Fig 1.0: New message sent to Londo in production</div>
+
+    ![Cloudwatch logs](assets/week-5/messaging-stream-londo.png)
+    <div align="center" style="font-weight: bold; margin-bottom:12px; padding-top:0px">Fig 1.1: Cloudwatch logs of incoming stream</div>
+
+    ![Message added to the DB](assets/week-5/streams-londo-manny.png)
+    <div align="center" style="font-weight: bold; margin-bottom:12px; padding-top:0px">Fig 1.2: New messages added to the DB</div>
