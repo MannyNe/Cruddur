@@ -1,2 +1,5 @@
 docker/**/*
 *.txt
+frontend-react-js/build/*
+*.env
+*.deb

@@ -1,6 +1,6 @@
 # Build Stage
 # Start from a minimalistic Python image and copy requirements.txt
-FROM python:3.10-slim-buster AS builder
+FROM 706157350338.dkr.ecr.us-east-1.amazonaws.com/cruddur-python:3.10-slim-buster AS builder
 WORKDIR /backend-flask
 COPY requirements.txt .
 
@@ -9,7 +9,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 # Production Stage
 # Start from a minimalistic Python image
-FROM python:3.10-slim-buster
+FROM 706157350338.dkr.ecr.us-east-1.amazonaws.com/cruddur-python:3.10-slim-buster
 
 # Set the working directory to /app
 WORKDIR /backend-flask
@@ -25,7 +25,7 @@ EXPOSE ${PORT}
 
 # Define environment variables
 ENV FLASK_APP=app.py \
-    FLASK_ENV=development
+    FLASK_DEBUG=1
 
 # Run the command to start Flask
 CMD [ "bash", "./init-backend.sh" ]
