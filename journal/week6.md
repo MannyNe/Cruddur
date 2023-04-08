@@ -12,13 +12,12 @@
     - [X] Provisioning an ECS cluster, creating an ECR repo then pushing both frontend and backend images, and deploying both apps to fargate.
     - [X] Provisioning and configuring Application Load Balancer along with target groups.
     - [X] Managed my domain using Route53, created an SSL certificate via ACM, setup a record set for naked domain to point to frontend-react-js, setup a record set for api subdomain to point to the backend-flask, and Configure CORS to only permit traffic from our domain.
-    - [X] Secured Flask by not running in debug mode for production
+    - [X] Secured Flask by not running in debug mode for production and Created Dockerfile specfically for production use case
     - [X] Implemented Refresh Token for Amazon Cognito
     - [X] Refactored bin directory to be top level
-    - [ ] Configured task defintions to contain x-ray and turn on Container Insights
-    - [ ] Changed Docker Compose to explicitly use a user-defined network
-    - [ ] Created Dockerfile specfically for production use case
-    - [ ] Used ruby generate out env dot files for docker using erb templates
+    - [X] Configured task defintions to contain x-ray and turn on Container Insights
+    - [X] Used ruby generate out env dot files for docker using erb templates
+    - [X] Changed Docker Compose to explicitly use a user-defined network
 
 - I will describe my work and the process in the order provided above.
 
@@ -477,4 +476,86 @@ The console should show the following if the tokens are accepted (working):
 -----------------------
 
 ### Refactored bin directory to be top level
-- 
+- To refactor the bin directory, we moved the `bin` directory to the top level of the project. The moved directory can be found [here](https://github.com/MannyNe/AWS-bootcamp/commit/eb939a5bd6f15db05abc84c412420b462fe88507) in this commit history. I added additional scripts to the `bin` directory to make it easier to run the scripts. All the refactorings and the additions to the code can be found in the above commit history.
+
+-----------------------
+
+### Configured task defintions to contain x-ray and turn on Container Insights
+- To configure the task definitions to contain x-ray and turn on Container Insights, we updated the task definition files for both apps to contain the following segment:
+
+```json
+.
+.
+.
+      {
+        "name": "xray",
+        "image": "public.ecr.aws/xray/aws-xray-daemon",
+        "essential": true,
+        "user": "1337",
+        "portMappings": [
+          {
+            "name": "xray",
+            "containerPort": 2000,
+            "protocol": "udp"
+          }
+        ]
+      },
+.
+.
+.
+```
+The updated task definition files can be found [here](https://github.com/MannyNe/AWS-bootcamp/blob/week-6/aws/task-definitions/frontend-react-js.json) for the frontend and [here](https://github.com/MannyNe/AWS-bootcamp/blob/week-6/aws/task-definitions/backend-flask.json) for the backend.
+
+- After updating the task definition files, we deployed the new task definitions to the ECS cluster using the script called `deploy` found in the `bin/backend` and `bin/frontend` directory. The `deploy` script for the backend can be found [here](https://github.com/MannyNe/AWS-bootcamp/blob/week-6/bin/backend/deploy) and the for the frontend, it can be found [here](https://github.com/MannyNe/AWS-bootcamp/blob/week-6/bin/frontend/deploy).
+
+- After deploying the new task definitions, we checked the ECS console to see if the new task definitions were deployed. The new task definitions were deployed successfully. The new task definitions can be seen in the following screenshots:
+
+![xray-frontend](assets/week-6/added-xray-to-backend.png)
+<div align="center" style="font-weight: bold; margin-bottom:12px; padding-top:0px">Fig 1.0: XRAY within backend</div>
+
+![xray-backend](assets/week-6/added-xray-to-frontend.png)
+<div align="center" style="font-weight: bold; margin-bottom:12px; padding-top:0px">Fig 1.1: XRAY within frontend</div>
+
+- After deploying the new task definitions, we enabled container insights for the ECS cluster. After using the app for a while, logs started showing up in the CloudWatch console. The logs can be seen in the following screenshot:
+
+![cloudwatch-logs](assets/week-6/cloudwatch-logs.png)
+<div align="center" style="font-weight: bold; margin-bottom:12px; padding-top:0px">Fig 1.2: Cloudwatch logs</div>
+
+-----------------------
+
+### Used ruby generate out env dot files for docker using erb templates
+- To use ruby to generate env files for docker using erb templates, we created a new directory called `erb` in the top level directory which contains the files `backend-flask.env.erb` and `frontend-react-js.env.erb`. The files can be found in the directory [here](https://github.com/MannyNe/AWS-bootcamp/blob/week-6/erb). These files give the template to use for generating the `env` files for both the frontend as well as the backend apps. The scripts that generate the `env` files are called `generate-env` and can be found in [here](https://github.com/MannyNe/AWS-bootcamp/blob/week-6/bin/frontend/generate-env) for the frontend, and [here](https://github.com/MannyNe/AWS-bootcamp/blob/week-6/bin/backend/generate-env) for the backend. After generating the env files, we updated the `docker-compose.yml` file to use the generated env files. A segment of the code looks like the following:
+
+```yml
+.
+.
+.
+  backend-flask:
+    container_name: "backend_flask"
+    env_file:
+      - backend-flask.env
+.
+.
+.
+```
+
+-----------------------
+
+### Changed Docker Compose to explicitly use a user-defined network
+- To change Docker Compose to explicitly use a user-defined network, we updated the `docker-compose.yml` file to use the following segment:
+
+```yml
+.
+.
+.
+networks: 
+  cruddur-net:
+    driver: bridge
+    name: cruddur-net
+.
+.
+.
+```
+- After issuing this change, we update the network for each of the services to use the `cruddur-net` network.
+
+The updated `docker-compose.yml` file can be found [here](https://github.com/MannyNe/AWS-bootcamp/blob/week-6/docker-compose.yaml)
