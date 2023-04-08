@@ -12,7 +12,7 @@
     - [X] Provisioning an ECS cluster, creating an ECR repo then pushing both frontend and backend images, and deploying both apps to fargate.
     - [X] Provisioning and configuring Application Load Balancer along with target groups.
     - [X] Managed my domain using Route53, created an SSL certificate via ACM, setup a record set for naked domain to point to frontend-react-js, setup a record set for api subdomain to point to the backend-flask, and Configure CORS to only permit traffic from our domain.
-    - [ ] Secured Flask by not running in debug mode for production
+    - [X] Secured Flask by not running in debug mode for production
     - [ ] Implemented Refresh Token for Amazon Cognito
     - [ ] Refactored bin directory to be top level
     - [ ] Configured task defintions to contain x-ray and turn on Container Insights
@@ -370,4 +370,42 @@
 -----------------------
 
 ### Secured Flask by not running in debug mode for production
-- 
+- To secure the flask, I updated the script that runs the flask app through the `Dockerfile` not run in debug mode. To do that, we added a new `Dockerfile.prod` and a new init-script so that we can separate between the development and production. The `init-backend-dev.sh` looks like the following:
+
+```sh
+#!/bin/bash
+python3 -m flask run --host=0.0.0.0 --port=4567 --debug
+```
+The script can be found [here](https://github.com/MannyNe/AWS-bootcamp/blob/week-6/backend-flask/init-backend-dev.sh)
+
+and the `init-backend-prod.sh` looks like the following:
+
+```sh
+#!/bin/bash
+python3 -m flask run --host=0.0.0.0 --port=4567 --no-debug --no-debugger --no-reload
+```
+The script can be found [here](https://github.com/MannyNe/AWS-bootcamp/blob/week-6/backend-flask/init-backend-prod.sh)
+
+- After creating the new scripts, we updated the `Dockerfile` and the `Dockerfile.prod` to use their respective scripts. The command within `Dockerfile` that starts the flask app looks like the following:
+
+```dockerfile
+.
+.
+.
+# Run the command to start Flask
+CMD [ "bash", "./init-backend-dev.sh" ]
+```
+The full Dockerfile can be found [here](https://github.com/MannyNe/AWS-bootcamp/blob/week-6/backend-flask/Dockerfile)
+
+and the command within `Dockerfile.prod` that starts the flask app looks like the following:
+
+```dockerfile
+.
+.
+.
+# Run the command to start Flask
+CMD [ "bash", "./init-backend-prod.sh" ]
+```
+The full Dockerfile can be found [here](https://github.com/MannyNe/AWS-bootcamp/blob/week-6/backend-flask/Dockerfile.prod)
+
+- After updating these files, we built and tested the new image. After testing the new image, we concluded that the new image works. But we didn't tag and push the new image to the ECR. Will try to do this on my own and debug the app thouroughly.
