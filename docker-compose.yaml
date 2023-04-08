@@ -2,30 +2,13 @@ version: "3.8"
 services:
   backend-flask:
     container_name: "backend_flask"
-    environment:
-      #CONNECTION_URL: "${PROD_CONNECTION_URL}"
-      #AWS_ENDPOINT_URL: "http://dynamodb-local:8000"
-      CONNECTION_URL: "postgresql://postgres:password@db:5432/cruddur"
-      FRONTEND_URL: "https://3000-${GITPOD_WORKSPACE_ID}.${GITPOD_WORKSPACE_CLUSTER_HOST}"
-      BACKEND_URL: "https://4567-${GITPOD_WORKSPACE_ID}.${GITPOD_WORKSPACE_CLUSTER_HOST}"
-      #FRONTEND_URL: "https://${CODESPACE_NAME}-3000.${GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN}"
-      #BACKEND_URL: "https://${CODESPACE_NAME}-4567.${GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN}"
-      #SIDE_CAR_URL: "https://6000-${GITPOD_WORKSPACE_ID}.${GITPOD_WORKSPACE_CLUSTER_HOST}"
-      OTEL_SERVICE_NAME: 'backend-flask'
-      OTEL_EXPORTER_OTLP_ENDPOINT: "https://api.honeycomb.io"
-      OTEL_EXPORTER_OTLP_HEADERS: "x-honeycomb-team=${HONEYCOMB_API_KEY}"
-      #AWS_XRAY_URL: "*4567-${GITPOD_WORKSPACE_ID}.${GITPOD_WORKSPACE_CLUSTER_HOST}*"
-      #AWS_XRAY_DAEMON_ADDRESS: "xray-daemon:2000"
-      AWS_DEFAULT_REGION: "${AWS_DEFAULT_REGION}"
-      AWS_ACCESS_KEY_ID: "${AWS_ACCESS_KEY_ID}"
-      AWS_SECRET_ACCESS_KEY: "${AWS_SECRET_ACCESS_KEY}"
-      ROLLBAR_ACCESS_TOKEN: "${ROLLBAR_ACCESS_TOKEN}"
-      AWS_COGNITO_USER_POOL_ID: "us-east-1_37QFkM89e"
-      AWS_COGNITO_USER_POOL_CLIENT_ID: "6bg85ltcq257hve1mcktj0n2i2"
-      #SIDE_CAR_NODE: "http://side-car-node:6000/verify-token"
+    env_file:
+      - backend-flask.env
     build: ./backend-flask
     ports:
       - "4567:4567"
+    networks:
+      - cruddur-net
     volumes:
       - ./backend-flask:/backend-flask
     healthcheck:
@@ -49,20 +32,13 @@ services:
   #    - /side-car-node/node_modules
   frontend-react-js:
     container_name: "frontend-react-js"
-    environment:
-      REACT_APP_BACKEND_URL: "https://4567-${GITPOD_WORKSPACE_ID}.${GITPOD_WORKSPACE_CLUSTER_HOST}"
-      #REACT_APP_BACKEND_URL: "https://${CODESPACE_NAME}-4567.${GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN}"
-      #REACT_APP_BACKEND_URL: "https://${CODESPACE_NAME}-6000.${GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN}" # SIDECAR PROXY
-      #REACT_APP_BACKEND_URL: "https://6000-${GITPOD_WORKSPACE_ID}.${GITPOD_WORKSPACE_CLUSTER_HOST}" # SIDECAR PROXY
-      OTEL_SERVICE_NAME: 'frontend-react-js'
-      HONEYCOMB_API_KEY: "${HONEYCOMB_API_KEY}"
-      REACT_APP_AWS_PROJECT_REGION: "${AWS_DEFAULT_REGION}"
-      REACT_APP_AWS_COGNITO_REGION: "${AWS_DEFAULT_REGION}"
-      REACT_APP_AWS_USER_POOLS_ID: "us-east-1_37QFkM89e"
-      REACT_APP_CLIENT_ID: "6bg85ltcq257hve1mcktj0n2i2"
+    env_file:
+      - frontend-react-js.env
     build: ./frontend-react-js
     ports:
       - "3000:3000"
+    networks:
+      - cruddur-net
     volumes:
       - ./frontend-react-js:/frontend-react-js
       - /frontend-react-js/node_modules
@@ -72,16 +48,18 @@ services:
       retries: 5
       start_period: 20s
       timeout: 5s
-  #xray-daemon:
-  #  image: "amazon/aws-xray-daemon"
-  #  environment:
-  #    AWS_ACCESS_KEY_ID: "${AWS_ACCESS_KEY_ID}"
-  #    AWS_SECRET_ACCESS_KEY: "${AWS_SECRET_ACCESS_KEY}"
-  #    AWS_REGION: "us-east-1"
-  #  command:
-  #    - "xray -o -b xray-daemon:2000"
-  #  ports:
-  #    - 2000:2000
+  xray-daemon:
+    image: "amazon/aws-xray-daemon"
+    environment:
+      AWS_ACCESS_KEY_ID: "${AWS_ACCESS_KEY_ID}"
+      AWS_SECRET_ACCESS_KEY: "${AWS_SECRET_ACCESS_KEY}"
+      AWS_REGION: "us-east-1"
+    command:
+      - "xray -o -b xray-daemon:2000"
+    ports:
+      - 2000:2000
+    networks:
+      - cruddur-net
   db:
     image: postgres:13-alpine
     restart: always
@@ -90,6 +68,8 @@ services:
       - POSTGRES_PASSWORD=password
     ports:
       - '5432:5432'
+    networks:
+      - cruddur-net
     volumes: 
       - db:/var/lib/postgresql/data
     healthcheck:
@@ -106,6 +86,8 @@ services:
     container_name: dynamodb-local
     ports:
       - "8000:8000"
+    networks:
+      - cruddur-net
     volumes:
       - "./docker/dynamodb:/home/dynamodblocal/data"
     working_dir: /home/dynamodblocal
@@ -113,9 +95,9 @@ services:
 # the name flag is a hack to change the default prepend folder
 # name when outputting the image names
 networks: 
-  internal-network:
+  cruddur-net:
     driver: bridge
-    name: cruddur
+    name: cruddur-net
 
 volumes:
   db:

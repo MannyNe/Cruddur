@@ -1,5 +1,4 @@
 #! /usr/bin/bash
-
 set -e # stop if it fails at any point
 
 if [ "$1" = "prod" ]; then

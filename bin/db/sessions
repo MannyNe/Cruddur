@@ -6,6 +6,7 @@ LABEL="db-sessions"
 printf "${CYAN}==> ${LABEL}${NO_COLOR}\n"
 
 if [ "$1" = "prod" ]; then
+    echo "Running in production mode"
     CON_URL=$PROD_CONNECTION_URL
 else
     CON_URL=$CONNECTION_URL
