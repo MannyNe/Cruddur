@@ -11,7 +11,7 @@
 - To test if we grasped the concepts provided to us through the meeting as well as the provided videos to aid us, we were given homeworks. They are:
     - [X] Provisioning an ECS cluster, creating an ECR repo then pushing both frontend and backend images, and deploying both apps to fargate.
     - [X] Provisioning and configuring Application Load Balancer along with target groups.
-    - [ ] Managed my domain using Route53, created an SSL certificate via ACM, setup a record set for naked domain to point to frontend-react-js, setup a record set for api subdomain to point to the backend-flask, and Configure CORS to only permit traffic from our domain.
+    - [X] Managed my domain using Route53, created an SSL certificate via ACM, setup a record set for naked domain to point to frontend-react-js, setup a record set for api subdomain to point to the backend-flask, and Configure CORS to only permit traffic from our domain.
     - [ ] Secured Flask by not running in debug mode for production
     - [ ] Implemented Refresh Token for Amazon Cognito
     - [ ] Refactored bin directory to be top level
@@ -318,4 +318,56 @@
 -----------------------
 
 ### Managed my domain using Route53, created an SSL certificate via ACM, setup a record set for naked domain to point to frontend-react-js, setup a record set for api subdomain to point to the backend-flask, and Configure CORS to only permit traffic from our domain.
+- I bought my domain name from [NameCheap](), which has a different zone from AWS Route53. To manage my domain name from AWS, I had to create a hosted zone in Route53. To do that, I used Route53 console to register the naked domain directly. After creating the hosted zone, I take the nameserver that was provided by AWS and add them in my namecheap domain registrar by creating a custom nameserver there.
+
+![nameserver-update-namecheap](assets/week-6/name-serv-namecheap.png)
+<div align="center" style="font-weight: bold; margin-bottom:12px; padding-top:0px">Fig 1.0: Namecheap nameserver change</div>
+
+- After the propagation finished, we created additional records to the domain name. To do that, we first created a certificate by going to ACM(AWS Certificate Manager). By using Console, we requested for a certificate. After validating the certificate, it shows that the certificate was issued:
+
+![issued-certificate](assets/week-6/ACM-certificate-issued.png)
+<div align="center" style="font-weight: bold; margin-bottom:12px; padding-top:0px">Fig 1.1: Certificate issued</div>
+
+- After issuing the certificate, we added new records to the domain name. We added an `A-record` for the naked domain and a record for the `api` subdomain. After creating those records, the console will look like the following:
+
+![A-Records](assets/week-6/add-route-53-A-records.png)
+<div align="center" style="font-weight: bold; margin-bottom:12px; padding-top:0px">Fig 1.2: Add A-Records</div>
+
+- After adding those records, we updated the load balancer to use the certificate. To do that, we went to the load balancer console and updated the listeners that were on port `4567` and `3000`. we added the `HTTP` and `HTTPS` protocols and removed the existing ports. The load balancer console looks like the following:
+
+![updated-LB-listener](assets/week-6/updated-lb-listener.png)
+<div align="center" style="font-weight: bold; margin-bottom:12px; padding-top:0px">Fig 1.3: Updated listener</div>
+
+- After updating the listener, we check if the website is working. We can check if the website is working by going to the domain name. I tried if the health route is working for my api subdomain, which worked. The result is the following:
+
+![Health-api](assets/week-6/route-api-health.png)
+<div align="center" style="font-weight: bold; margin-bottom:12px; padding-top:0px">Fig 1.3: Api health check</div>
+
+- After checking the health route, we updated the cors for our backend task-definition. we changed the values from `*` to the domain names. The cors looks like the following:
+
+```json
+.
+.
+.
+        "environment": [
+          {"name": "OTEL_SERVICE_NAME", "value": "backend-flask"},
+          {"name": "OTEL_EXPORTER_OTLP_ENDPOINT", "value": "https://api.honeycomb.io"},
+          {"name": "AWS_COGNITO_USER_POOL_ID", "value": "us-east-1_37QFkM89e"},
+          {"name": "AWS_COGNITO_USER_POOL_CLIENT_ID", "value": "6bg85ltcq257hve1mcktj0n2i2"},
+          {"name": "FRONTEND_URL", "value": "https://realmanny.me"},
+          {"name": "BACKEND_URL", "value": "https://api.realmanny.me"},
+          {"name": "AWS_DEFAULT_REGION", "value": "us-east-1"}
+        ],
+.
+.
+.
+```
+- After updating the cors, we registed the new task definition and updated the service. After updating the service, we updated the frontend buid command th have the new backend url. After building, tagging then pushing the new image, we tested if the website is working, which both the frontend and backend worked. The result is the following:
+
+![website-functional](assets/week-6/final-frontend-backend-cors.png)
+<div align="center" style="font-weight: bold; margin-bottom:12px; padding-top:0px">Fig 1.4: Website functional</div>
+
+-----------------------
+
+### Secured Flask by not running in debug mode for production
 - 
