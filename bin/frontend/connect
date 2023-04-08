@@ -1,17 +1,17 @@
 #! /usr/bin/bash
 
 if [ -z "$1" ]; then
-  echo "No TABLE_NAME argument supplied eg ./bin/ecs/connect-to-backend-flask 8fee85a246f04a20aff49939d34e2846"
+  echo "No TABLE_NAME argument supplied eg ./bin/frontend/connect 8fee85a246f04a20aff49939d34e2846"
   exit 1
 fi
 TASK_ID=$1
 
-CONTAINER_NAME=backend-flask
+CONTAINER_NAME=frontend-react-js
 
 aws ecs execute-command  \
 --region $AWS_DEFAULT_REGION \
 --cluster cruddur \
 --task $TASK_ID \
 --container $CONTAINER_NAME \
---command "/bin/bash" \
+--command "/bin/sh" \
 --interactive
