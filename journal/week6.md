@@ -10,7 +10,7 @@
 ## Required Homework/Tasks (class summary)
 - To test if we grasped the concepts provided to us through the meeting as well as the provided videos to aid us, we were given homeworks. They are:
     - [X] Provisioning an ECS cluster, creating an ECR repo then pushing both frontend and backend images, and deploying both apps to fargate.
-    - [ ] Provisioning and configuring Application Load Balancer along with target groups.
+    - [X] Provisioning and configuring Application Load Balancer along with target groups.
     - [ ] Managed my domain using Route53, created an SSL certificate via ACM, setup a record set for naked domain to point to frontend-react-js, setup a record set for api subdomain to point to the backend-flask, and Configure CORS to only permit traffic from our domain.
     - [ ] Secured Flask by not running in debug mode for production
     - [ ] Implemented Refresh Token for Amazon Cognito
@@ -308,3 +308,14 @@
 -----------------------
 
 ### Provisioning and configuring Application Load Balancer along with target groups.
+- To provision and configure Application Load Balancer along with target groups, we first created a new load balancer via ClickOps. We created a load balancer with an ALB type. We named the load balancer `cruddur-alb` and then we attached the existing subnets then created a new security group named `cruddur-alb-sg`. We gave an inbound rule of `HTTP` and `HTTPS` with a source of my own IP adddress so that the website would be accessed by me. After that, we updated the exixsting security group to get accessed by the newly created security group. After a long configuration process, we finally set up the load balancer. The ECS Load Balancer Console looks like the following:
+![Active-Services](assets/week-6/load-balancer.png)
+<div align="center" style="font-weight: bold; margin-bottom:12px; padding-top:0px">Fig 1.0: Load Balancer</div>
+
+![Healthy-Services](assets/week-6/lb-target-groups.png)
+<div align="center" style="font-weight: bold; margin-bottom:12px; padding-top:0px">Fig 1.1: Target Groups</div>
+
+-----------------------
+
+### Managed my domain using Route53, created an SSL certificate via ACM, setup a record set for naked domain to point to frontend-react-js, setup a record set for api subdomain to point to the backend-flask, and Configure CORS to only permit traffic from our domain.
+- 
