@@ -13,8 +13,8 @@
     - [X] Provisioning and configuring Application Load Balancer along with target groups.
     - [X] Managed my domain using Route53, created an SSL certificate via ACM, setup a record set for naked domain to point to frontend-react-js, setup a record set for api subdomain to point to the backend-flask, and Configure CORS to only permit traffic from our domain.
     - [X] Secured Flask by not running in debug mode for production
-    - [ ] Implemented Refresh Token for Amazon Cognito
-    - [ ] Refactored bin directory to be top level
+    - [X] Implemented Refresh Token for Amazon Cognito
+    - [X] Refactored bin directory to be top level
     - [ ] Configured task defintions to contain x-ray and turn on Container Insights
     - [ ] Changed Docker Compose to explicitly use a user-defined network
     - [ ] Created Dockerfile specfically for production use case
@@ -409,3 +409,72 @@ CMD [ "bash", "./init-backend-prod.sh" ]
 The full Dockerfile can be found [here](https://github.com/MannyNe/AWS-bootcamp/blob/week-6/backend-flask/Dockerfile.prod)
 
 - After updating these files, we built and tested the new image. After testing the new image, we concluded that the new image works. But we didn't tag and push the new image to the ECR. Will try to do this on my own and debug the app thouroughly.
+
+-----------------------
+
+### Implemented Refresh Token for Amazon Cognito
+- To implement the refresh token, we updated our `checkAuth.js` function to check if the token is expired. If the token is expired, we will use the refresh token to get a new access token. The updated function looks like the following:
+
+```js
+import { Auth } from 'aws-amplify';
+
+export async function getAccessToken(){
+    Auth.currentSession()
+    .then((cognito_user_session) => {
+      const access_token = cognito_user_session.accessToken.jwtToken
+      localStorage.setItem("access_token", access_token)
+    })
+    .catch((err) => console.log(err));
+}
+
+export async function checkAuth(setUser){
+  Auth.currentAuthenticatedUser({
+    // Optional, By default is false. 
+    // If set to true, this call will send a 
+    // request to Cognito to get the latest user data
+    bypassCache: false 
+  })
+  .then((cognito_user) => {
+    console.log('cognito_user',cognito_user);
+    setUser({
+      display_name: cognito_user.attributes.name,
+      handle: cognito_user.attributes.preferred_username
+    })
+    return Auth.currentSession()
+  }).then((cognito_user_session) => {
+      console.log('cognito_user_session',cognito_user_session);
+      localStorage.setItem("access_token", cognito_user_session.accessToken.jwtToken)
+  })
+  .catch((err) => console.log(err));
+};
+```
+The file can be found [here](https://github.com/MannyNe/AWS-bootcamp/blob/week-6/frontend-react-js/src/lib/CheckAuth.js)
+
+- After that, we updated the import statement of all the files that use the `checkAuth.js` function. The updated import statement looks like the following:
+
+```js
+import { checkAuth, getAccessToken } from '../lib/CheckAuth'
+```
+
+- After importing the statements, we update the files that use that import to use the `getAccessToken` function. The updated codes are the following:
+
+```js
+.
+.
+.
+      await getAccessToken()
+      const access_token = localStorage.getItem("access_token")
+.
+.
+.
+```
+The updated files list can be found in the commit history [here](https://github.com/MannyNe/AWS-bootcamp/commit/3b29dd0c84be8e388feba929b306ec7e2019a851)
+
+The console should show the following if the tokens are accepted (working):
+![console-dev](assets/week-6/fix-expiring-token.png)
+<div align="center" style="font-weight: bold; margin-bottom:12px; padding-top:0px">Fig 1.0: Fixed token issue</div>
+
+-----------------------
+
+### Refactored bin directory to be top level
+- 
