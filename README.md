@@ -1,4 +1,4 @@
-# AWS Cloud Project Bootcamp
+# FREE AWS Cloud Project Bootcamp
 
 - Application: Cruddur
 - Cohort: 2023-A1
@@ -23,8 +23,8 @@ The `/journal` directory contains
 - [X] [Week 3](journal/week3.md)
 - [X] [Week 4](journal/week4.md)
 - [X] [Week 5](journal/week5.md)
-- [ ] [Week 6](journal/week6.md)
-- [ ] [Week 7](journal/week7.md)
+- [X] [Week 6](journal/week6.md)
+- [X] [Week 7](journal/week7.md)
 - [ ] [Week 8](journal/week8.md)
 - [ ] [Week 9](journal/week9.md)
 - [ ] [Week 10](journal/week10.md)
