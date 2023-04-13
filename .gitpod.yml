@@ -25,6 +25,13 @@ tasks:
     command: |
       export GITPOD_IP=$(curl ifconfig.me)
       source "$THEIA_WORKSPACE_ROOT/bin/rds/update-sg-rule"
+      cd $THEIA_WORKSPACE_ROOT
+  - name: cdk
+    before: |
+      npm install aws-cdk -g
+      cd thumbing-serverless-cdk
+      cp .env.example .env
+      npm i
 
 vscode:
   extensions:
