@@ -6,7 +6,7 @@
             "ThresholdType": "PERCENTAGE"
         },
         "Subscribers": [{
-            "Address": "amannnegussie2@outlook.com",
+            "Address": "amannnegussie@outlook.com",
             "SubscriptionType": "EMAIL"
         }]
     },
@@ -18,7 +18,7 @@
             "ThresholdType": "PERCENTAGE"
         },
         "Subscribers": [{
-            "Address": "amannnegussie2@outlook.com",
+            "Address": "amannnegussie@outlook.com",
             "SubscriptionType": "EMAIL"
         }]
     },
@@ -30,7 +30,7 @@
             "ThresholdType": "PERCENTAGE"
         },
         "Subscribers": [{
-            "Address": "amannnegussie2@outlook.com",
+            "Address": "amannnegussie@outlook.com",
             "SubscriptionType": "EMAIL"
         }]
     }
