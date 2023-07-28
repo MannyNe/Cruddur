@@ -7,11 +7,11 @@ PROJECT_PATH=$(dirname $BIN_PATH)
 FRONTEND_REACT_JS_PATH="$PROJECT_PATH/frontend-react-js"
 
 docker build \
---build-arg REACT_APP_BACKEND_URL="https://api.realmanny.me" \
+--build-arg REACT_APP_BACKEND_URL="https://api.realmanny.tech" \
 --build-arg REACT_APP_AWS_PROJECT_REGION="$AWS_DEFAULT_REGION" \
 --build-arg REACT_APP_AWS_COGNITO_REGION="$AWS_DEFAULT_REGION" \
---build-arg REACT_APP_AWS_USER_POOLS_ID="us-east-1_37QFkM89e" \
---build-arg REACT_APP_CLIENT_ID="6bg85ltcq257hve1mcktj0n2i2" \
+--build-arg REACT_APP_AWS_USER_POOLS_ID="us-east-1_04jipO7kj" \
+--build-arg REACT_APP_CLIENT_ID="1hknjjikkhfcro0qneo8er40ic" \
 -t frontend-react-js \
 -f "$FRONTEND_REACT_JS_PATH/Dockerfile.prod" \
 "$FRONTEND_REACT_JS_PATH/."
