@@ -49,10 +49,10 @@ Parameters:
     Default: 1hknjjikkhfcro0qneo8er40ic
   EnvFrontendUrl:
     Type: String
-    Default: "*"
+    Default: "https://realmanny.tech"
   EnvBackendUrl:
     Type: String
-    Default: "*"
+    Default: "https://api.realmanny.tech"
   SecretsAWSAccessKeyId:
     Type: String
     Default: 'arn:aws:ssm:us-east-1:523227374974:parameter/cruddur/backend-flask/AWS_ACCESS_KEY_ID'
