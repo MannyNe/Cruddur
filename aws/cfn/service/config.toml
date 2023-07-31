@@ -1,0 +1,8 @@
+[deploy]
+bucket = 'cfn-artifacts-realmanny'
+region = 'us-east-1'
+stack_name = 'CrdSrvBackendFlask'
+
+[parameters]
+EnvFrontendUrl = 'https://realmanny.tech'
+EnvBackendUrl = 'https://api.realmanny.tech'

@@ -1,0 +1,8 @@
+[deploy]
+bucket = 'cfn-artifacts-realmanny'
+region = 'us-east-1'
+stack_name = 'CrdCluster'
+
+[parameters]
+CertificateArn = 'arn:aws:acm:us-east-1:523227374974:certificate/5fe85613-5abc-4d46-a6e7-b9b23cdc9137'
+NetworkingStack = 'CrdNet'
