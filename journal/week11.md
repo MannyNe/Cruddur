@@ -1634,6 +1634,6 @@ The final deployment output should look like this:
 ### CFN Diagram
 
 - The final diagram looks like this:
-[**Lucid Charts Diagram Link**](https://lucid.app/lucidchart/ae2dab9c-3331-4b0a-b610-26a5be45672c/edit?viewport_loc=-552%2C-56%2C4689%2C2342%2C7d5grplc8hAo&invitationId=inv_ce17d7f5-4aed-45ef-97a5-4e0fb7813844)
+[**Lucid Charts Diagram Link**](https://lucid.app/lucidchart/ae2dab9c-3331-4b0a-b610-26a5be45672c/edit?viewport_loc=562%2C-259%2C3933%2C1964%2C5cchCuoX-ZUV&invitationId=inv_ce17d7f5-4aed-45ef-97a5-4e0fb7813844)
 
 ---
