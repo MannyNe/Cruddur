@@ -9,4 +9,4 @@ ClusterStack = 'CrdCluster'
 GitHubBranch = 'prod'
 GithubRepo = 'MannyNe/AWS-bootcamp'
 ArtifactBucketName = "codepipeline-cruddur-artifacts-realmanny"
-BuildSpec = 'backend-flask/buildspec.yml'
+BuildSpec = 'backend-flask/buildspec.yaml'
