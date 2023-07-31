@@ -13,7 +13,7 @@ This is the starting codebase that will be used in the FREE AWS Cloud Project Bo
 
 At the start of the bootcamp you need to create a new Github Repository from this template.
 
-## Journaling Homeworkk
+## Journaling Homework
 
 The `/journal` directory contains
 
