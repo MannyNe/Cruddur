@@ -34,7 +34,7 @@ export default function MessageGroupItem(props) {
           title={format_datetime(props.message_group.created_at)}
         >
           <span className="ago">
-            {format_time_created_at(props.message_group.created_at)}
+            {message_time_ago(props.message_group.created_at)}
           </span>
         </div>
         {/* created_at */}
