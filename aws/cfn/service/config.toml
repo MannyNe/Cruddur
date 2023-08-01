@@ -6,3 +6,4 @@ stack_name = 'CrdSrvBackendFlask'
 [parameters]
 EnvFrontendUrl = 'https://realmanny.tech'
 EnvBackendUrl = 'https://api.realmanny.tech'
+DDBMessageTable = 'CrdDdb-DynamoDBTable-YP209E0X2CCD'
