@@ -7,5 +7,6 @@ stack_name = 'CrdCicd'
 ServiceStack = 'CrdSrvBackendFlask'
 ClusterStack = 'CrdCluster'
 GitHubBranch = 'prod'
-GithubRepo = 'AWS-bootcamp'
+GithubRepo = 'MannyNe/AWS-bootcamp'
 ArtifactBucketName = "codepipeline-cruddur-artifacts-realmanny"
+BuildSpec = 'backend-flask/buildspec.yaml'
